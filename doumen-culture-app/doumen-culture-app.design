@@ -1,0 +1,149 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 2032,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-e44aeea2",
+          "measuredAt": 1786441668522
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-venue-detail",
+      "title": "场地详情与预约",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 312,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1026,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-3cafc2aa",
+          "measuredAt": 1786512828756
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/venue-detail.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-team",
+      "title": "团队管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 618,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 984,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-9d4b72ef",
+          "measuredAt": 1786441668522
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/team.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-bookings",
+      "title": "预约记录",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 927,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1280,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-9896763d",
+          "measuredAt": 1786441668522
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/bookings.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-profile",
+      "title": "个人中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 1236,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-a75bfd7c",
+          "measuredAt": 1786441668522
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-culture-center",
+      "title": "文化中心介绍",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 1545,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1582,
+          "viewportWidth": 375,
+          "sourceHash": "fnv1a-c0afac09",
+          "measuredAt": 1786441668522
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/culture-center.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "mobile",
+    "projectName": "斗门文化中心 — 用户端",
+    "designLibrary": null,
+    "visualEditorEnabled": false
+  }
+}

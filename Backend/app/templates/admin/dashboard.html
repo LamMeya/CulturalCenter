@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工作台 - 斗门文化中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dm-primary: #3d8e7a; --dm-primary-dark: #2e6e5e; --dm-bg: #faf8f6;
+  --dm-card: #ffffff; --dm-border: #ebe3da; --dm-text: #211c18;
+  --dm-muted: #8c7b6a; --dm-accent: #e8a840; --dm-radius: 12px;
+  --state-success: #4caf7d; --state-warning: #e8a840; --state-error: #d4644a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; background: var(--dm-bg); color: var(--dm-text); font-size: 14px; line-height: 1.6; }
+h1,h2,h3 { font-family: 'Noto Serif SC', serif; }
+
+/* Layout */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: #1a3a32; color: #fff; flex-shrink: 0; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; transition: transform 0.3s; }
+.sidebar-logo { padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-logo h2 { font-size: 1rem; font-weight: 700; letter-spacing: 0.04em; }
+.sidebar-logo p { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 0.9rem; margin: 2px 0; transition: all 0.2s; }
+.sidebar-nav a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sidebar-nav a.active { background: var(--dm-primary); color: #fff; font-weight: 500; }
+.sidebar-nav a svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; }
+.sidebar-footer .user-info { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6); }
+.sidebar-footer .logout-btn { color: rgba(255,255,255,0.5); cursor: pointer; margin-top: 6px; display: inline-block; font-size: 0.75rem; }
+.sidebar-footer .logout-btn:hover { color: var(--dm-accent); }
+
+.main { flex: 1; margin-left: 220px; }
+.topbar { background: var(--dm-card); border-bottom: 1px solid var(--dm-border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.topbar .menu-btn { display: none; background: none; border: none; cursor: pointer; color: var(--dm-text); padding: 4px; }
+.topbar .page-title { font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 600; }
+.topbar .role-badge { background: #ecf5f2; color: var(--dm-primary); padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+.content { padding: 24px; max-width: 1200px; }
+
+/* Stats cards */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: var(--dm-card); border: 1px solid var(--dm-border); border-radius: var(--dm-radius); padding: 20px; display: flex; align-items: center; gap: 14px; }
+.stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-icon.mint { background: #ecf5f2; color: var(--dm-primary); }
+.stat-icon.gold { background: #fdf6e8; color: var(--dm-accent); }
+.stat-icon.blue { background: #eef5fb; color: #5b9ecf; }
+.stat-icon.green { background: #e8f5ee; color: var(--state-success); }
+.stat-val { font-size: 1.6rem; font-weight: 700; font-family: 'Noto Serif SC', serif; }
+.stat-label { font-size: 0.8rem; color: var(--dm-muted); }
+
+/* Cards */
+.card { background: var(--dm-card); border: 1px solid var(--dm-border); border-radius: var(--dm-radius); padding: 20px; margin-bottom: 20px; }
+.card h3 { font-size: 1rem; margin-bottom: 14px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--dm-border); font-weight: 600; color: var(--dm-muted); font-size: 0.78rem; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--dm-border); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+.badge-pending { background: #fdf6e8; color: var(--dm-accent); }
+.badge-won { background: #e8f5ee; color: var(--state-success); }
+.badge-lost { background: #f5f0eb; color: var(--dm-muted); }
+.badge-cancelled { background: #fdf0ed; color: var(--state-error); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; font-family: inherit; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: var(--dm-primary); color: #fff; }
+.btn-primary:hover { background: var(--dm-primary-dark); }
+.btn-outline { background: transparent; border: 1.5px solid var(--dm-border); color: var(--dm-text); }
+.btn-outline:hover { border-color: var(--dm-primary); color: var(--dm-primary); }
+.btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+.btn-danger { background: var(--state-error); color: #fff; }
+.btn-danger:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Forms */
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.form-row input, .form-row select { padding: 9px 12px; border: 1.5px solid var(--dm-border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; background: var(--dm-bg); min-width: 140px; }
+.form-row input:focus, .form-row select:focus { border-color: var(--dm-primary); }
+input, select, textarea { padding: 10px 14px; border: 1.5px solid var(--dm-border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; background: var(--dm-bg); width: 100%; }
+textarea { resize: vertical; min-height: 80px; }
+input:focus, select:focus, textarea:focus { border-color: var(--dm-primary); }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 5px; color: var(--dm-muted); }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: var(--dm-card); border-radius: 14px; padding: 28px; width: 90%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
+.modal-box h3 { margin-bottom: 16px; }
+
+/* Toast */
+.toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: #fff; font-size: 0.85rem; z-index: 300; animation: slideIn 0.3s ease; }
+.toast.success { background: var(--state-success); }
+.toast.error { background: var(--state-error); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Spinner */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .topbar .menu-btn { display: block; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .content { padding: 16px; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; }
+  .form-row input, .form-row select { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><h2>斗门文化中心</h2><p>场地预约管理系统</p></div>
+    <div class="sidebar-nav">
+      <a href="/admin/dashboard" class="active">📊 工作台</a>
+      <a href="/admin/venues">🏛️ 场地管理</a>
+      <a href="/admin/bookings">📅 预约管理</a>
+      <a href="/admin/time-slots">⏰ 时间段设置</a>
+      <a href="/admin/notifications">🔔 通知管理</a>
+      <a href="/admin/app-users">👤 用户管理</a>
+      <a href="/admin/users" id="nav-users">👥 管理员管理</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info" id="sidebarUser">👤 <span id="sidebarName">--</span></div>
+      <span class="logout-btn" onclick="logout()">退出登录</span>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">工作台</span>
+      <span class="role-badge" id="roleBadge">管理员</span>
+    </div>
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon mint">🏛️</div><div><div class="stat-val" id="statVenues">-</div><div class="stat-label">活跃场地</div></div></div>
+        <div class="stat-card"><div class="stat-icon gold">📅</div><div><div class="stat-val" id="statWeekly">-</div><div class="stat-label">本周预约</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">🎲</div><div><div class="stat-val" id="statPending">-</div><div class="stat-label">待抽签</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-val" id="statWon">-</div><div class="stat-label">已中签</div></div></div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3>快捷操作</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="autoDraw()">🎲 自动抽签</button>
+          <button class="btn btn-outline" onclick="window.location.href='/admin/time-slots'">⏰ 生成时间段</button>
+          <button class="btn btn-outline" onclick="window.location.href='/admin/notifications'">🔔 发布通知</button>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="card">
+        <h3>最近预约</h3>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>ID</th><th>场地</th><th>团队</th><th>用户</th><th>日期</th><th>时间段</th><th>状态</th>
+          </tr></thead>
+          <tbody id="recentBookings"><tr><td colspan="7" style="text-align:center;color:var(--dm-muted);">加载中...</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+
+// Auth
+function getToken() { return localStorage.getItem('admin_token'); }
+function getHeaders() {
+  const token = getToken();
+  if (!token) { window.location.href = '/admin/login'; return {}; }
+  return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/x-www-form-urlencoded' };
+}
+
+function logout() { localStorage.clear(); window.location.href = '/admin/login'; }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+function toast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || 'success');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+async function apiFetch(url, opts = {}) {
+  const h = getHeaders();
+  if (opts.body && typeof opts.body === 'object') {
+    const fd = new URLSearchParams();
+    for (const [k,v] of Object.entries(opts.body)) fd.append(k,v);
+    opts.body = fd;
+  }
+  const res = await fetch(API + url, { ...opts, headers: { ...h, ...(opts.headers||{}) } });
+  if (res.status === 401) { logout(); return; }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({detail:'请求失败'}));
+    throw new Error(err.detail || '请求失败');
+  }
+  return res.json();
+}
+
+// Load dashboard
+async function loadDashboard() {
+  try {
+    const stats = await apiFetch('/bookings/stats');
+    document.getElementById('statVenues').textContent = stats.total_venues || 0;
+    document.getElementById('statWeekly').textContent = stats.weekly_bookings || 0;
+    document.getElementById('statPending').textContent = stats.pending_draws || 0;
+    document.getElementById('statWon').textContent = stats.won_bookings || 0;
+  } catch(e) { console.error(e); }
+
+  try {
+    const bookings = await apiFetch('/bookings');
+    const tbody = document.getElementById('recentBookings');
+    const statusBadge = { pending: 'badge-pending', won: 'badge-won', lost: 'badge-lost', cancelled: 'badge-cancelled' };
+    const statusText = { pending: '待抽签', won: '已中签', lost: '未中签', cancelled: '已取消' };
+    tbody.innerHTML = bookings.slice(0, 10).map(b => `<tr>
+      <td>${b.id}</td><td>${b.venue?.name||'-'}</td><td>${b.team?.name||'-'}</td><td>${b.user?.nickname||'-'}</td>
+      <td>${b.time_slot?.available_date||'-'}</td><td>${b.time_slot?.start_time||''}-${b.time_slot?.end_time||''}</td>
+      <td><span class="badge ${statusBadge[b.status]||''}">${statusText[b.status]||b.status}</span></td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--dm-muted);">暂无预约记录</td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+async function autoDraw() {
+  if (!confirm('确定执行自动抽签？')) return;
+  try {
+    const res = await apiFetch('/bookings/auto-draw', { method: 'POST' });
+    toast(`抽签完成，处理了 ${res.processed} 条预约`);
+    loadDashboard();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// Init
+(function init() {
+  if (!getToken()) { window.location.href = '/admin/login'; return; }
+  document.getElementById('sidebarName').textContent = localStorage.getItem('admin_name') || '--';
+  document.getElementById('roleBadge').textContent = {super_admin:'超级管理员',admin:'管理员',operator:'操作员'}[localStorage.getItem('admin_role')] || '--';
+  if (localStorage.getItem('admin_role') !== 'super_admin') {
+    document.getElementById('nav-users').style.display = 'none';
+  }
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "1.0",
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.07.22.00.00.00",
+    "version_source": "skill-release-manifest.json"
+  },
+  "project": {
+    "resolvedLane": "complex_html_page",
+    "operation": "create",
+    "deviceType": "mobile",
+    "intentProfile": {
+      "caseFamily": "free_exploration",
+      "sourceType": "text_prd",
+      "multiDevice": true
+    },
+    "selectedIntentWorkflowRead": true,
+    "contextRequirementsLoaded": [
+      { "path": "shared-runtime/runtime-boundaries/lane-runtime-contracts.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "delivery-quality/page-rendering-quality-gate.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "delivery-quality/design-artifact-validation.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "delivery-quality/delivery-evidence-contract.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "visual-experience/visual-experience-guidelines.md", "readStatus": "loaded", "bodyRead": true },
+      { "path": "visual-experience/visual-checkpoint-protocol.md", "readStatus": "loaded", "bodyRead": true }
+    ],
+    "contextReadScope": "complex-build-mobile-phase-1",
+    "validationRunDiscipline": "one-pass-post-generation",
+    "lowValueCallWatchdog": { "noProgressNextAction": "move_to_readiness" },
+    "dispatchPreflightManifest": [],
+    "expectedDispatches": [],
+    "validationHistory": [],
+    "validationRepairLedger": [],
+    "generationTree": {
+      "root": "mobile-app",
+      "children": [
+        { "nodeId": "page-index", "type": "leaf", "priority": "P0" },
+        { "nodeId": "page-venue-detail", "type": "leaf", "priority": "P0" },
+        { "nodeId": "page-team", "type": "leaf", "priority": "P0" },
+        { "nodeId": "page-bookings", "type": "leaf", "priority": "P1" },
+        { "nodeId": "page-profile", "type": "leaf", "priority": "P1" },
+        { "nodeId": "page-culture-center", "type": "leaf", "priority": "P2" }
+      ]
+    },
+    "cssPreflightEvidence": {
+      "status": "manual",
+      "cssFilePath": "colors_and_type.css",
+      "brandPrefix": "dm",
+      "note": "Preflight skipped due to Node v10 incompatibility; CSS manually verified with semantic aliases"
+    },
+    "styleDefinitionBrief": "Cultural center venue booking, Doumen fishing village artistic style, coastal blue-green + warm shell white, fishing lantern warm accents, airy and natural with water town texture",
+    "designRead": "mobile mini-program / community users / warm natural / medium density / avoid corporate sterility",
+    "designDials": { "layoutVariance": 3, "motionIntensity": 2, "visualDensity": 3 },
+    "designSource": {
+      "operatingMode": "free-explore",
+      "cssFilePath": "colors_and_type.css",
+      "brandPrefix": "dm",
+      "styleConstraints": {
+        "radiusMax": 12,
+        "staticShadowAlphaMax": 0.05
+      }
+    },
+    "sharedProjectShellContract": {
+      "mobileNavigation": {
+        "applies": true,
+        "type": "bottom-tab",
+        "items": [
+          { "key": "home", "label": "首页", "icon": "home" },
+          { "key": "team", "label": "团队", "icon": "users" },
+          { "key": "bookings", "label": "预约", "icon": "calendar" },
+          { "key": "profile", "label": "我的", "icon": "user" }
+        ],
+        "heightPx": 56,
+        "position": "flow-bottom",
+        "activeState": "primary icon+label color only; geometry stays identical",
+        "structure": {
+          "navTag": "nav",
+          "navClass": "fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--dm-border)] h-[56px] safe-area-bottom",
+          "innerClass": "w-full max-w-md mx-auto grid grid-cols-4 h-full",
+          "itemTag": "a",
+          "itemClass": "min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full",
+          "iconClass": "w-5 h-5 shrink-0",
+          "labelClass": "text-[11px] leading-none whitespace-nowrap max-w-full truncate",
+          "activeRule": "only color/font-weight/data-active may change; no class changes that affect layout",
+          "markerAttr": "data-mobile-nav=\"global\""
+        }
+      }
+    }
+  },
+  "designSource": {
+    "operatingMode": "free-explore",
+    "cssFilePath": "colors_and_type.css",
+    "brandPrefix": "dm",
+    "styleConstraints": {
+      "radiusMax": 12,
+      "staticShadowAlphaMax": 0.05
+    }
+  },
+  "pages": [
+    {
+      "nodeId": "page-index",
+      "title": "首页",
+      "htmlSrc": "pages/index.html",
+      "pageIndex": 1,
+      "mobileNavigationActiveKey": "home",
+      "visualNorthStar": "Warm venue cards with oyster-shell texture, fishing lantern accent notifications, water town ambiance",
+      "compositionPattern": "stacked-cards",
+      "continuityAnchors": ["dm-primary-500 text on dm-card bg", "dm-border card separators", "Noto Serif SC headings"],
+      "componentPlan": ["venue-card", "notification-banner", "section-header", "culture-center-entry"],
+      "imagePlan": ["venue-photos", "water-town-pattern-bg"],
+      "features": ["场地浏览", "取消预约醒目提醒", "文化中心入口"]
+    },
+    {
+      "nodeId": "page-venue-detail",
+      "title": "场地详情与预约",
+      "htmlSrc": "pages/venue-detail.html",
+      "pageIndex": 2,
+      "mobileNavigationActiveKey": "home",
+      "visualNorthStar": "Hero venue image, clean time-slot grid, warm confirmation flow",
+      "compositionPattern": "hero-image + form-grid",
+      "continuityAnchors": ["dm-primary-500 time-slot selection", "dm-card container", "dm-border dividers"],
+      "componentPlan": ["venue-hero", "time-slot-grid", "booking-form", "confirm-button"],
+      "imagePlan": ["venue-hero-image"],
+      "features": ["场地图片展示", "时间段选择", "预约提交", "预约成功提示"]
+    },
+    {
+      "nodeId": "page-team",
+      "title": "团队管理",
+      "htmlSrc": "pages/team.html",
+      "pageIndex": 3,
+      "mobileNavigationActiveKey": "team",
+      "visualNorthStar": "Clean member list, warm team card, clear action buttons",
+      "compositionPattern": "list-detail",
+      "continuityAnchors": ["dm-card team card", "dm-primary-500 action buttons", "dm-border list separators"],
+      "componentPlan": ["team-card", "member-list", "action-buttons", "search-bar"],
+      "imagePlan": [],
+      "features": ["创建团队", "加入团队", "搜索团队", "解散/转移团队", "副团长设置"]
+    },
+    {
+      "nodeId": "page-bookings",
+      "title": "预约记录",
+      "htmlSrc": "pages/bookings.html",
+      "pageIndex": 4,
+      "mobileNavigationActiveKey": "bookings",
+      "visualNorthStar": "Status-driven booking cards, clear lottery results, warm notification style",
+      "compositionPattern": "list-status",
+      "continuityAnchors": ["dm-card booking cards", "state tokens for status", "dm-border separators"],
+      "componentPlan": ["booking-card", "status-badge", "cancel-button", "empty-state"],
+      "imagePlan": [],
+      "features": ["预约历史列表", "抽签状态显示", "取消预约", "频次限制提示"]
+    },
+    {
+      "nodeId": "page-profile",
+      "title": "个人中心",
+      "htmlSrc": "pages/profile.html",
+      "pageIndex": 5,
+      "mobileNavigationActiveKey": "profile",
+      "visualNorthStar": "Simple profile card, warm menu items, clean logout",
+      "compositionPattern": "profile-menu",
+      "continuityAnchors": ["dm-card profile card", "dm-primary-500 highlights", "dm-border menu dividers"],
+      "componentPlan": ["profile-header", "menu-list", "logout-button"],
+      "imagePlan": [],
+      "features": ["角色信息", "预约记录入口", "退出登录"]
+    },
+    {
+      "nodeId": "page-culture-center",
+      "title": "文化中心介绍",
+      "htmlSrc": "pages/culture-center.html",
+      "pageIndex": 6,
+      "mobileNavigationActiveKey": "home",
+      "visualNorthStar": "Rich imagery, warm informational layout, accessible contact and location",
+      "compositionPattern": "info-stacked",
+      "continuityAnchors": ["dm-card info sections", "dm-primary-500 emphasis", "dm-border section dividers"],
+      "componentPlan": ["info-section", "contact-card", "map-placeholder", "parking-info"],
+      "imagePlan": ["culture-center-photo"],
+      "features": ["地理位置", "地址", "联系电话", "停车场地", "开放时间"]
+    }
+  ],
+  "assets": [],
+  "wiringPlan": [],
+  "hiddenInteractionPlan": []
+}

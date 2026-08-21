@@ -1,0 +1,130 @@
+<!-- pages/index/index.wxml — 首页 -->
+<view class="page-index">
+
+  <!-- 顶部品牌区 — 渔村波浪装饰 -->
+  <view class="brand-hero">
+    <view class="brand-wave">
+      <view class="wave-layer wave-1"></view>
+      <view class="wave-layer wave-2"></view>
+      <view class="wave-layer wave-3"></view>
+    </view>
+    <view class="brand-content">
+      <text class="brand-name">斗门文化中心</text>
+      <text class="brand-subtitle">渔乡文艺 · 文化传承</text>
+    </view>
+  </view>
+
+  <!-- 通知横幅 — 横向滚动 -->
+  <view class="notification-bar" wx:if="{{notifications.length > 0}}">
+    <view class="notification-icon">
+      <text class="icon-bell">&#x1F514;</text>
+    </view>
+    <swiper
+      class="notification-swiper"
+      vertical
+      autoplay
+      interval="3000"
+      circular
+      duration="600"
+      current="{{notificationIndex}}"
+    >
+      <swiper-item wx:for="{{notifications}}" wx:key="id">
+        <view
+          class="notification-item"
+          data-notification="{{item}}"
+          bindtap="onNotificationTap"
+        >
+          <text class="notification-text">{{item.title}}</text>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="notification-arrow">⟩</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在加载场馆信息...</text>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-container" wx:if="{{errorMsg && !loading}}">
+    <text class="error-text">{{errorMsg}}</text>
+    <view class="btn-retry" bindtap="fetchVenues">重新加载</view>
+  </view>
+
+  <!-- 场馆列表 -->
+  <view class="section" wx:if="{{!loading && !errorMsg}}">
+    <view class="section-header">
+      <text class="section-title">特色场馆</text>
+      <text class="section-count">{{venues.length}} 个场馆</text>
+    </view>
+
+    <view class="venue-list">
+      <view
+        class="venue-card"
+        wx:for="{{venues}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onVenueTap"
+      >
+        <!-- 场馆图片占位 — 渐变背景 -->
+        <view class="venue-image">
+          <image
+            wx:if="{{item.image_url}}"
+            src="{{item.image_url}}"
+            mode="aspectFill"
+            class="venue-img"
+          />
+          <view wx:else class="venue-img-placeholder">
+            <view class="placeholder-icon">🏛</view>
+          </view>
+          <view class="venue-image-tag" wx:if="{{item.category}}">
+            {{item.category}}
+          </view>
+        </view>
+
+        <!-- 场馆信息 -->
+        <view class="venue-info">
+          <view class="venue-name-row">
+            <text class="venue-name">{{item.name}}</text>
+            <text class="venue-status {{item.status === 'open' ? 'status-open' : 'status-closed'}}">
+              {{item.status === 'open' ? '开放中' : '维护中'}}
+            </text>
+          </view>
+
+          <view class="venue-meta">
+            <view class="meta-item">
+              <text class="meta-icon">👥</text>
+              <text class="meta-text">{{item.capacity || '--'}} 人</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">📐</text>
+              <text class="meta-text">{{item.area || '--'}} m²</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">📍</text>
+              <text class="meta-text meta-address">{{item.address || '斗门文化中心'}}</text>
+            </view>
+          </view>
+
+          <view class="venue-footer">
+            <view class="facility-tags" wx:if="{{item.facilities && item.facilities.length > 0}}">
+              <text class="facility-tag" wx:for="{{item.facilities}}" wx:key="*this" wx:for-item="facility">
+                {{facility}}
+              </text>
+            </view>
+            <view class="venue-arrow">⟩</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{venues.length === 0}}">
+      <text class="empty-icon">🏛</text>
+      <text class="empty-text">暂无可用场馆</text>
+      <text class="empty-hint">下拉刷新试试</text>
+    </view>
+  </view>
+</view>

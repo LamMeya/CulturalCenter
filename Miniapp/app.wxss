@@ -1,0 +1,76 @@
+/* 全局样式 — 斗门文化中心 渔乡文艺风 */
+page {
+  --dm-primary: #3d8e7a;
+  --dm-primary-dark: #2e6e5e;
+  --dm-bg: #faf8f6;
+  --dm-card: #ffffff;
+  --dm-border: #ebe3da;
+  --dm-text: #211c18;
+  --dm-muted: #8c7b6a;
+  --dm-accent: #e8a840;
+  --dm-radius: 16rpx;
+  --dm-radius-sm: 8rpx;
+
+  background-color: var(--dm-bg);
+  color: var(--dm-text);
+  font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+/* 通用卡片 */
+.card {
+  background: var(--dm-card);
+  border-radius: var(--dm-radius);
+  padding: 24rpx;
+  margin: 16rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+
+/* 青绿主按钮 */
+.btn-primary {
+  background: var(--dm-primary);
+  color: #fff;
+  border-radius: var(--dm-radius-sm);
+  padding: 20rpx;
+  text-align: center;
+  font-weight: 600;
+  font-size: 30rpx;
+}
+.btn-primary:active { background: var(--dm-primary-dark); }
+.btn-primary[disabled] { background: #b0cbc4; }
+
+/* 边框按钮 */
+.btn-outline {
+  border: 2rpx solid var(--dm-border);
+  color: var(--dm-text);
+  border-radius: var(--dm-radius-sm);
+  padding: 20rpx;
+  text-align: center;
+  background: var(--dm-card);
+}
+
+/* 标签 */
+.badge-pending { background: #fdf6e8; color: #e8a840; }
+.badge-won { background: #e8f5ee; color: #4caf7d; }
+.badge-lost { background: #f5f0eb; color: #8c7b6a; }
+.badge-cancelled { background: #fdf0ed; color: #d4644a; }
+
+/* 标题 */
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin: 24rpx 24rpx 16rpx;
+  color: var(--dm-text);
+}
+
+/* 通知横幅 */
+.notification-banner {
+  background: linear-gradient(135deg, #fdf6e8, #fef0d0);
+  border-left: 6rpx solid var(--dm-accent);
+  padding: 20rpx 24rpx;
+  margin: 16rpx 24rpx;
+  border-radius: var(--dm-radius-sm);
+  font-size: 26rpx;
+  color: #8a6d20;
+}

@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>场地管理 - 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+      --state-success: #4caf7d;
+      --state-warning: #e8a840;
+      --state-error: #d4644a;
+      --font-heading: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+      --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--dm-foreground);
+      background: var(--dm-background);
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: linear-gradient(180deg, #1d3e37 0%, #224a41 50%, #1a2e28 100%);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 28px 20px 24px;
+      border-bottom: 1px solid rgba(235, 227, 218, 0.12);
+    }
+
+    .sidebar-logo h1 {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      color: #faf8f6;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .sidebar-logo p {
+      font-size: 0.72rem;
+      color: rgba(250, 248, 246, 0.5);
+      margin-top: 2px;
+      letter-spacing: 0.06em;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 8px;
+      color: rgba(250, 248, 246, 0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-nav a:hover {
+      background: rgba(250, 248, 246, 0.08);
+      color: rgba(250, 248, 246, 0.9);
+    }
+
+    .sidebar-nav a.active {
+      background: rgba(61, 142, 122, 0.35);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      width: 3px;
+      height: 20px;
+      background: #3d8e7a;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(235, 227, 218, 0.12);
+    }
+
+    .sidebar-footer a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(250, 248, 246, 0.5);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .sidebar-footer a:hover {
+      color: rgba(250, 248, 246, 0.8);
+    }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      padding: 32px 36px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-header h2 {
+      font-size: 1.6rem;
+      color: var(--dm-foreground);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+    }
+
+    .btn-primary:hover {
+      background: #2e7262;
+      box-shadow: 0 2px 8px rgba(61, 142, 122, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--dm-primary);
+      border: 1.5px solid var(--dm-primary);
+    }
+
+    .btn-outline:hover {
+      background: rgba(61, 142, 122, 0.06);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--dm-foreground);
+      padding: 6px 12px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--dm-muted);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--state-error);
+      border: 1.5px solid var(--state-error);
+    }
+
+    .btn-danger:hover {
+      background: rgba(212, 100, 74, 0.06);
+    }
+
+    .btn-danger-solid {
+      background: var(--state-error);
+      color: #ffffff;
+    }
+
+    .btn-danger-solid:hover {
+      background: #c0583e;
+      box-shadow: 0 2px 8px rgba(212, 100, 74, 0.3);
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 0.82rem;
+    }
+
+    /* ===== Card & Table ===== */
+    .card {
+      background: var(--dm-card);
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-lg);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--dm-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8c7b6a;
+      background: var(--dm-muted);
+      border-bottom: 1px solid var(--dm-border);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    tbody td {
+      padding: 14px 20px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--dm-border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(245, 240, 235, 0.5);
+    }
+
+    .venue-thumb {
+      width: 64px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: var(--dm-muted);
+      border: 1px solid var(--dm-border);
+    }
+
+    .venue-name {
+      font-weight: 600;
+      color: var(--dm-foreground);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-badge.open {
+      background: #e8f5ee;
+      color: var(--state-success);
+    }
+
+    .status-badge.closed {
+      background: #fdf0ed;
+      color: var(--state-error);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .status-dot.open {
+      background: var(--state-success);
+    }
+
+    .status-dot.closed {
+      background: var(--state-error);
+    }
+
+    .action-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== Search ===== */
+    .search-box {
+      position: relative;
+      width: 320px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 9px 14px 9px 38px;
+      border: 1.5px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box input::placeholder {
+      color: #bfb0a0;
+    }
+
+    .search-box input:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px rgba(61, 142, 122, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #bfb0a0;
+      pointer-events: none;
+    }
+
+    /* ===== Modal ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(33, 28, 24, 0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg);
+      width: 560px;
+      max-width: 94vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--dm-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      color: var(--dm-foreground);
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #8c7b6a;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--dm-muted);
+      color: var(--dm-foreground);
+    }
+
+    .modal-body {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-footer {
+      padding: 18px 28px;
+      border-top: 1px solid var(--dm-border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #544a40;
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px rgba(61, 142, 122, 0.12);
+    }
+
+    .form-group textarea {
+      min-height: 90px;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #bfb0a0;
+    }
+
+    .form-group .hint {
+      font-size: 0.78rem;
+      color: #a89885;
+    }
+
+    /* Upload Area */
+    .upload-area {
+      border: 2px dashed var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--dm-muted);
+    }
+
+    .upload-area:hover {
+      border-color: var(--dm-primary);
+      background: rgba(61, 142, 122, 0.04);
+    }
+
+    .upload-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 8px;
+      color: #a89885;
+    }
+
+    .upload-area p {
+      font-size: 0.82rem;
+      color: #a89885;
+    }
+
+    .upload-area .primary-text {
+      color: var(--dm-primary);
+      font-weight: 500;
+    }
+
+    .upload-preview {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .upload-preview img {
+      width: 100px;
+      height: 68px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--dm-border);
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--dm-muted);
+      border-radius: var(--dm-radius-medium);
+    }
+
+    .toggle-row .toggle-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--dm-foreground);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #d9cec1;
+      border-radius: 26px;
+      transition: 0.25s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--dm-primary);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      background: var(--dm-muted);
+      color: #544a40;
+      font-weight: 500;
+    }
+
+    .tag .tag-remove {
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #a89885;
+      line-height: 1;
+      margin-left: 2px;
+    }
+
+    .tag .tag-remove:hover {
+      color: var(--state-error);
+    }
+
+    .tag-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tag-input-row input {
+      flex: 1;
+    }
+
+    .tags-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Delete Modal */
+    .modal-sm {
+      width: 420px;
+    }
+
+    .delete-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fdf0ed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: var(--state-error);
+      font-size: 1.6rem;
+    }
+
+    .delete-modal-body {
+      text-align: center;
+      padding: 32px 28px 16px;
+    }
+
+    .delete-modal-body p {
+      color: #544a40;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .delete-modal-body .venue-name-highlight {
+      font-weight: 600;
+      color: var(--dm-foreground);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: #a89885;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+    }
+
+    /* Cap count */
+    .cap-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+
+    .cap-count svg {
+      width: 16px;
+      height: 16px;
+      color: #8c7b6a;
+    }
+
+    /* Responsive note */
+    .table-wrap {
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======== SIDEBAR ======== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>斗门文化中心</h1>
+      <p>DOUMEN CULTURAL CENTER</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </span>
+        工作台
+      </a>
+      <a href="venue-manage.html" class="active">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </span>
+        场地管理
+      </a>
+      <a href="booking-manage.html">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+        </span>
+        预约管理
+      </a>
+      <a href="time-slots.html">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+        时间段设置
+      </a>
+      <a href="notifications.html">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </span>
+        通知管理
+      </a>
+      <a href="admin-users.html">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        管理员管理
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        退出登录
+      </a>
+    </div>
+  </aside>
+
+  <!-- ======== MAIN CONTENT ======== -->
+  <main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>场地管理</h2>
+      <button class="btn btn-primary" data-dom-id="add-venue-btn" onclick="openAddModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新增场地
+      </button>
+    </div>
+
+    <!-- Venue Table Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" data-dom-id="search-input" placeholder="搜索场地名称..." oninput="filterVenues()">
+        </div>
+        <span style="font-size:0.82rem;color:#a89885;" id="venue-count">共 4 个场地</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:90px;">图片</th>
+                <th>场地名称</th>
+                <th style="width:120px;">容纳人数</th>
+                <th style="width:100px;">状态</th>
+                <th style="width:160px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="venue-table-body">
+            </tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="empty-state" style="display:none;">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <p>暂无匹配的场地</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======== ADD / EDIT VENUE MODAL ======== -->
+  <div class="modal-overlay" id="venue-modal-overlay">
+    <div class="modal" id="venue-modal">
+      <div class="modal-header">
+        <h3 id="venue-modal-title">新增场地</h3>
+        <button class="modal-close" onclick="closeVenueModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>场地名称</label>
+          <input type="text" data-dom-id="modal-venue-name" id="modal-venue-name" placeholder="请输入场地名称" maxlength="50">
+        </div>
+
+        <div class="form-group">
+          <label>场地图片</label>
+          <div class="upload-area" data-dom-id="modal-venue-image" onclick="document.getElementById('venue-image-file').click()">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p>点击上传图片，或拖拽文件到此处</p>
+            <p class="primary-text" style="margin-top:4px;">支持 JPG、PNG 格式</p>
+          </div>
+          <input type="file" id="venue-image-file" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+          <div class="upload-preview" id="upload-preview"></div>
+        </div>
+
+        <div class="form-group">
+          <label>文字介绍</label>
+          <textarea data-dom-id="modal-venue-desc" id="modal-venue-desc" placeholder="请输入场地文字介绍" maxlength="500"></textarea>
+          <span class="hint" id="desc-count">0/500</span>
+        </div>
+
+        <div class="form-group">
+          <label>容纳人数</label>
+          <input type="number" data-dom-id="modal-venue-capacity" id="modal-venue-capacity" placeholder="请输入容纳人数" min="1" max="9999">
+        </div>
+
+        <div class="form-group">
+          <label>设施标签</label>
+          <div class="tag-input-row">
+            <input type="text" data-dom-id="modal-venue-tag-input" id="modal-venue-tag-input" placeholder="输入标签后按回车添加" onkeydown="handleTagKeydown(event)">
+            <button class="btn btn-outline btn-sm" onclick="addTag()" type="button">添加</button>
+          </div>
+          <div class="tags-list" id="tags-list"></div>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">场地开放状态</span>
+          <label class="toggle-switch">
+            <input type="checkbox" data-dom-id="modal-venue-status" id="modal-venue-status" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeVenueModal()">取消</button>
+        <button class="btn btn-primary" data-dom-id="modal-save-btn" onclick="saveVenue()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== DELETE CONFIRMATION MODAL ======== -->
+  <div class="modal-overlay" id="delete-modal-overlay">
+    <div class="modal modal-sm" id="delete-modal">
+      <div class="delete-modal-body">
+        <div class="delete-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <p>确认删除场地 <span class="venue-name-highlight" id="delete-venue-name"></span> 吗？</p>
+        <p style="color:#a89885; font-size:0.82rem; margin-top:6px;">此操作不可撤销，删除后相关预约数据将一并清除。</p>
+      </div>
+      <div class="modal-footer" style="border-top:none; justify-content:center; padding-top:0;">
+        <button class="btn btn-outline" onclick="closeDeleteModal()">取消</button>
+        <button class="btn btn-danger-solid" data-dom-id="modal-delete-confirm-btn" onclick="confirmDelete()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== MOCK DATA =====
+    let venues = [
+      {
+        id: 1,
+        name: '多功能演艺厅',
+        image: '',
+        imageBg: 'linear-gradient(135deg, #3d8e7a 0%, #5eaa94 50%, #8cc7b5 100%)',
+        desc: '可容纳200人的多功能演艺厅，配备专业灯光音响设备，适合举办文艺演出、讲座、会议等活动。',
+        capacity: 200,
+        tags: ['灯光音响', '投影设备', '舞台', '化妆间'],
+        status: 'open'
+      },
+      {
+        id: 2,
+        name: '书画展览室',
+        image: '',
+        imageBg: 'linear-gradient(135deg, #e8a840 0%, #f0c060 50%, #f5d890 100%)',
+        desc: '面积约150平方米的展览空间，采用专业展陈灯光，可举办书画展、摄影展等各类文化艺术展览。',
+        capacity: 80,
+        tags: ['展陈灯光', '展板', '恒温恒湿'],
+        status: 'open'
+      },
+      {
+        id: 3,
+        name: '非遗传承教室',
+        image: '',
+        imageBg: 'linear-gradient(135deg, #5b9ecf 0%, #7db8e0 50%, #a0d0f0 100%)',
+        desc: '专门用于非遗技艺传承的教学空间，配备传统手工艺操作台，可开展咸水歌、装泥鱼等非遗项目教学。',
+        capacity: 40,
+        tags: ['操作台', '多媒体', '展陈柜'],
+        status: 'open'
+      },
+      {
+        id: 4,
+        name: '水乡文化展厅',
+        image: '',
+        imageBg: 'linear-gradient(135deg, #d4644a 0%, #e08870 50%, #edb0a0 100%)',
+        desc: '以斗门水乡文化为主题的常设展厅，展示疍家文化、渔具渔法、水乡民俗等内容。',
+        capacity: 120,
+        tags: ['互动屏幕', '实物展柜', '影音室'],
+        status: 'closed'
+      }
+    ];
+
+    let nextId = 5;
+    let editingVenueId = null;
+    let deleteTargetId = null;
+    let currentTags = [];
+    let uploadedImageData = null;
+
+    // ===== TABLE RENDERING =====
+    function renderTable(data) {
+      const tbody = document.getElementById('venue-table-body');
+      const emptyState = document.getElementById('empty-state');
+      const countEl = document.getElementById('venue-count');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        countEl.textContent = '共 0 个场地';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      countEl.textContent = '共 ' + data.length + ' 个场地';
+
+      tbody.innerHTML = data.map(v => {
+        const imgHtml = v.image
+          ? '<img class="venue-thumb" src="' + v.image + '" alt="' + v.name + '">'
+          : '<div class="venue-thumb" style="background:' + v.imageBg + ';display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-heading);font-size:0.65rem;letter-spacing:0.04em;">' + v.name.slice(0, 2) + '</div>';
+
+        const statusHtml = v.status === 'open'
+          ? '<span class="status-badge open"><span class="status-dot open"></span>开放</span>'
+          : '<span class="status-badge closed"><span class="status-dot closed"></span>关闭</span>';
+
+        return '<tr>' +
+          '<td>' + imgHtml + '</td>' +
+          '<td><span class="venue-name">' + escapeHtml(v.name) + '</span></td>' +
+          '<td><span class="cap-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' + v.capacity + ' 人</span></td>' +
+          '<td>' + statusHtml + '</td>' +
+          '<td><div class="action-btns">' +
+            '<button class="btn btn-ghost btn-sm" data-dom-id="edit-btn" onclick="openEditModal(' + v.id + ')">编辑</button>' +
+            '<button class="btn btn-danger btn-sm" data-dom-id="delete-btn" onclick="openDeleteModal(' + v.id + ')">删除</button>' +
+          '</div></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===== SEARCH =====
+    function filterVenues() {
+      const query = document.querySelector('[data-dom-id="search-input"]').value.toLowerCase().trim();
+      if (query === '') {
+        renderTable(venues);
+        return;
+      }
+      const filtered = venues.filter(v => v.name.toLowerCase().includes(query));
+      renderTable(filtered);
+    }
+
+    // ===== MODAL: ADD / EDIT =====
+    function openAddModal() {
+      editingVenueId = null;
+      currentTags = [];
+      uploadedImageData = null;
+      document.getElementById('venue-modal-title').textContent = '新增场地';
+      document.getElementById('modal-venue-name').value = '';
+      document.getElementById('modal-venue-desc').value = '';
+      document.getElementById('modal-venue-capacity').value = '';
+      document.getElementById('modal-venue-status').checked = true;
+      document.getElementById('upload-preview').innerHTML = '';
+      document.getElementById('tags-list').innerHTML = '';
+      document.getElementById('desc-count').textContent = '0/500';
+      document.getElementById('venue-modal-overlay').classList.add('active');
+    }
+
+    function openEditModal(id) {
+      const venue = venues.find(v => v.id === id);
+      if (!venue) return;
+
+      editingVenueId = id;
+      currentTags = [...venue.tags];
+      uploadedImageData = venue.image || null;
+
+      document.getElementById('venue-modal-title').textContent = '编辑场地';
+      document.getElementById('modal-venue-name').value = venue.name;
+      document.getElementById('modal-venue-desc').value = venue.desc;
+      document.getElementById('modal-venue-capacity').value = venue.capacity;
+      document.getElementById('modal-venue-status').checked = venue.status === 'open';
+      document.getElementById('desc-count').textContent = venue.desc.length + '/500';
+      renderTags();
+      renderUploadPreview();
+      document.getElementById('venue-modal-overlay').classList.add('active');
+    }
+
+    function closeVenueModal() {
+      document.getElementById('venue-modal-overlay').classList.remove('active');
+      editingVenueId = null;
+      currentTags = [];
+      uploadedImageData = null;
+    }
+
+    function saveVenue() {
+      const name = document.getElementById('modal-venue-name').value.trim();
+      const desc = document.getElementById('modal-venue-desc').value.trim();
+      const capacity = parseInt(document.getElementById('modal-venue-capacity').value) || 0;
+      const status = document.getElementById('modal-venue-status').checked ? 'open' : 'closed';
+
+      if (!name) {
+        alert('请输入场地名称');
+        return;
+      }
+      if (capacity <= 0) {
+        alert('请输入有效的容纳人数');
+        return;
+      }
+
+      const imageBg = uploadedImageData
+        ? ''
+        : 'linear-gradient(135deg, #3d8e7a 0%, #5eaa94 50%, #8cc7b5 100%)';
+
+      if (editingVenueId !== null) {
+        const idx = venues.findIndex(v => v.id === editingVenueId);
+        if (idx !== -1) {
+          venues[idx].name = name;
+          venues[idx].image = uploadedImageData || venues[idx].image;
+          venues[idx].imageBg = uploadedImageData ? '' : venues[idx].imageBg || imageBg;
+          venues[idx].desc = desc;
+          venues[idx].capacity = capacity;
+          venues[idx].tags = [...currentTags];
+          venues[idx].status = status;
+        }
+      } else {
+        const newVenue = {
+          id: nextId++,
+          name: name,
+          image: uploadedImageData || '',
+          imageBg: imageBg,
+          desc: desc,
+          capacity: capacity,
+          tags: [...currentTags],
+          status: status
+        };
+        venues.push(newVenue);
+      }
+
+      closeVenueModal();
+      renderTable(venues);
+    }
+
+    // ===== IMAGE UPLOAD =====
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedImageData = e.target.result;
+        renderUploadPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderUploadPreview() {
+      const preview = document.getElementById('upload-preview');
+      if (uploadedImageData) {
+        preview.innerHTML = '<img src="' + uploadedImageData + '" alt="预览">';
+      } else {
+        preview.innerHTML = '';
+      }
+    }
+
+    // ===== TAGS =====
+    function addTag() {
+      const input = document.getElementById('modal-venue-tag-input');
+      const tag = input.value.trim();
+      if (tag && !currentTags.includes(tag)) {
+        currentTags.push(tag);
+        renderTags();
+      }
+      input.value = '';
+    }
+
+    function handleTagKeydown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addTag();
+      }
+    }
+
+    function removeTag(index) {
+      currentTags.splice(index, 1);
+      renderTags();
+    }
+
+    function renderTags() {
+      const container = document.getElementById('tags-list');
+      container.innerHTML = currentTags.map((t, i) =>
+        '<span class="tag">' + escapeHtml(t) + '<span class="tag-remove" onclick="removeTag(' + i + ')">&times;</span></span>'
+      ).join('');
+    }
+
+    // ===== DESCRIPTION COUNTER =====
+    document.getElementById('modal-venue-desc').addEventListener('input', function() {
+      document.getElementById('desc-count').textContent = this.value.length + '/500';
+    });
+
+    // ===== DELETE MODAL =====
+    function openDeleteModal(id) {
+      const venue = venues.find(v => v.id === id);
+      if (!venue) return;
+      deleteTargetId = id;
+      document.getElementById('delete-venue-name').textContent = venue.name;
+      document.getElementById('delete-modal-overlay').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-modal-overlay').classList.remove('active');
+      deleteTargetId = null;
+    }
+
+    function confirmDelete() {
+      if (deleteTargetId !== null) {
+        venues = venues.filter(v => v.id !== deleteTargetId);
+        renderTable(venues);
+      }
+      closeDeleteModal();
+    }
+
+    // ===== MODAL CLICK OUTSIDE TO CLOSE =====
+    document.getElementById('venue-modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeVenueModal();
+    });
+    document.getElementById('delete-modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteModal();
+    });
+
+    // ===== ESC TO CLOSE =====
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (document.getElementById('venue-modal-overlay').classList.contains('active')) {
+          closeVenueModal();
+        } else if (document.getElementById('delete-modal-overlay').classList.contains('active')) {
+          closeDeleteModal();
+        }
+      }
+    });
+
+    // ===== INITIAL RENDER =====
+    renderTable(venues);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+/* pages/bookings/bookings.wxss — 我的预约 */
+
+.page-container {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* ========== 加载中 ========== */
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid var(--dm-border);
+  border-top-color: var(--dm-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  color: var(--dm-muted);
+  font-size: 26rpx;
+}
+
+/* ========== 空状态 ========== */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 32rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+/* ========== 预约列表 ========== */
+.bookings-list {
+  padding-top: 16rpx;
+}
+
+.booking-card {
+  margin-bottom: 8rpx;
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.venue-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+}
+
+/* 状态标签 */
+.status-badge {
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.badge-pending {
+  background: #fdf6e8;
+  color: #e8a840;
+}
+
+.badge-won {
+  background: #e8f5ee;
+  color: #4caf7d;
+}
+
+.badge-lost {
+  background: #f5f0eb;
+  color: #8c7b6a;
+}
+
+.badge-cancelled {
+  background: #fdf0ed;
+  color: #d4644a;
+}
+
+/* 预约信息 */
+.booking-info {
+  margin-bottom: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: var(--dm-text);
+}
+
+/* 操作按钮 */
+.booking-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--dm-border);
+}
+
+.btn-cancel {
+  padding: 12rpx 32rpx;
+  border-radius: var(--dm-radius-sm);
+  border: 2rpx solid #d4644a;
+  color: #d4644a;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.btn-cancel:active {
+  background: #fdf0ed;
+}
+
+/* ========== 取消确认弹窗 ========== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 560rpx;
+  background: var(--dm-card);
+  border-radius: var(--dm-radius);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 40rpx 32rpx 20rpx;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+}
+
+.modal-body {
+  padding: 0 32rpx 32rpx;
+  text-align: center;
+}
+
+.modal-text {
+  font-size: 28rpx;
+  color: var(--dm-text);
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.modal-hint {
+  font-size: 24rpx;
+  color: var(--dm-muted);
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid var(--dm-border);
+}
+
+.modal-btn {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.modal-btn-cancel {
+  color: var(--dm-muted);
+  border-right: 1rpx solid var(--dm-border);
+}
+
+.modal-btn-confirm {
+  color: #d4644a;
+}
+
+.modal-btn-confirm.disabled {
+  color: #d4a8a0;
+}
+
+.modal-btn:active {
+  background: #faf8f6;
+}
+/* ========== 未登录提示 ========== */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.login-prompt-icon {
+  font-size: 100rpx;
+  margin-bottom: 32rpx;
+}
+
+.login-prompt-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+  margin-bottom: 12rpx;
+}
+
+.login-prompt-desc {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  margin-bottom: 40rpx;
+}
+
+.login-prompt-btn {
+  padding: 20rpx 80rpx;
+  background: var(--dm-primary);
+  color: #fff;
+  border-radius: var(--dm-radius-sm);
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.login-prompt-btn:active {
+  background: var(--dm-primary-dark);
+}

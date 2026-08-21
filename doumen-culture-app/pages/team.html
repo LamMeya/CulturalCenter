@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>团队管理 - 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--dm-background);
+      color: var(--dm-foreground);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 72px;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .card {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg);
+      border: 1px solid var(--dm-border);
+      box-shadow: 0 1px 3px rgba(33, 28, 24, 0.04);
+    }
+
+    .btn-primary {
+      background: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+      border-radius: var(--dm-radius-medium);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:active {
+      opacity: 0.85;
+      transform: scale(0.98);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--dm-primary);
+      border: 1.5px solid var(--dm-primary);
+      border-radius: var(--dm-radius-medium);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:active {
+      background: rgba(61, 142, 122, 0.06);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: #d4644a;
+      border: 1.5px solid #d4644a;
+      border-radius: var(--dm-radius-medium);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-danger:active {
+      background: rgba(212, 100, 74, 0.06);
+    }
+
+    .input-field {
+      background: var(--dm-card);
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      padding: 10px 14px;
+      font-size: 15px;
+      color: var(--dm-foreground);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px rgba(61, 142, 122, 0.12);
+    }
+
+    .input-field::placeholder {
+      color: #a89885;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .badge-leader {
+      background: #e8a840;
+      color: #fff;
+    }
+
+    .badge-vice {
+      background: var(--dm-primary);
+      color: #fff;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--dm-border);
+      margin: 0;
+    }
+
+    .section-title {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--dm-foreground);
+      letter-spacing: 0.02em;
+    }
+
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    /* Bottom nav active state */
+    [data-active="true"] .nav-icon,
+    [data-active="true"] .nav-label {
+      color: var(--dm-primary);
+    }
+
+    [data-active="false"] .nav-icon,
+    [data-active="false"] .nav-label {
+      color: #a89885;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(33, 28, 24, 0.5);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-sheet {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg) var(--dm-radius-lg) 0 0;
+      width: 100%;
+      max-width: 448px;
+      padding: 24px 20px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0));
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <div class="max-w-md mx-auto px-4 pt-6 pb-4">
+
+    <!-- ====== PAGE HEADER ====== -->
+    <h1 class="text-2xl mb-6">团队管理</h1>
+
+    <!-- ============================
+         VIEW: HAS TEAM (已加入团队)
+         ============================ -->
+    <div id="has-team-view">
+
+      <!-- Team Info Card -->
+      <div class="card p-5 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xl">渔乡文艺社</h2>
+          <span class="badge badge-leader">我是团长</span>
+        </div>
+        <p class="text-sm text-[#6b5d50] leading-relaxed mb-3">
+          斗门水乡文化爱好者团队，致力于传承和推广渔乡传统文化，定期组织文艺活动和社区交流。
+        </p>
+        <div class="flex items-center gap-3 text-sm text-[#8c7b6a]">
+          <span>团长：陈团长</span>
+          <span class="w-1 h-1 rounded-full bg-[#d9cec1]"></span>
+          <span>成员 8 人</span>
+        </div>
+      </div>
+
+      <!-- Member List -->
+      <div class="card mb-4">
+        <div class="px-5 py-3 border-b border-[var(--dm-border)]">
+          <h3 class="section-title">团队成员</h3>
+        </div>
+        <div class="divide-y divide-[var(--dm-border)]">
+          <!-- Member: 团长 -->
+          <div class="flex items-center px-5 py-3 gap-3" data-dom-id="member-leader">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-primary)] flex items-center justify-center text-white font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">陈</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium truncate">陈团长</span>
+                <span class="badge badge-leader shrink-0">团长</span>
+              </div>
+              <p class="text-xs text-[#8c7b6a] mt-0.5">138****6789</p>
+            </div>
+          </div>
+
+          <!-- Member: 副团长 -->
+          <div class="flex items-center px-5 py-3 gap-3" data-dom-id="member-vice-leader">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-muted)] flex items-center justify-center text-[var(--dm-primary)] font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">李</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium truncate">李副团</span>
+                <span class="badge badge-vice shrink-0">副团长</span>
+              </div>
+              <p class="text-xs text-[#8c7b6a] mt-0.5">139****1234</p>
+            </div>
+          </div>
+
+          <!-- Member: 普通成员 1 -->
+          <div class="flex items-center px-5 py-3 gap-3" data-dom-id="member-1">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-muted)] flex items-center justify-center text-[#6b5d50] font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">张</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium truncate">张小渔</span>
+              <p class="text-xs text-[#8c7b6a] mt-0.5">136****5678</p>
+            </div>
+          </div>
+
+          <!-- Member: 普通成员 2 -->
+          <div class="flex items-center px-5 py-3 gap-3" data-dom-id="member-2">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-muted)] flex items-center justify-center text-[#6b5d50] font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">王</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium truncate">王水乡</span>
+              <p class="text-xs text-[#8c7b6a] mt-0.5">137****9012</p>
+            </div>
+          </div>
+
+          <!-- Member: 普通成员 3 -->
+          <div class="flex items-center px-5 py-3 gap-3" data-dom-id="member-3">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-muted)] flex items-center justify-center text-[#6b5d50] font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">赵</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium truncate">赵渔灯</span>
+              <p class="text-xs text-[#8c7b6a] mt-0.5">135****3456</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 团长操作: 副团长设置 -->
+      <div class="card p-5 mb-4" id="leader-actions">
+        <h3 class="section-title mb-3">团长管理</h3>
+        <div class="flex flex-col gap-2.5">
+          <button class="btn-outline py-2.5 px-4 text-sm w-full" data-dom-id="vice-leader-settings-btn" onclick="toggleViceLeaderModal()">
+            设置副团长
+          </button>
+          <button class="btn-outline py-2.5 px-4 text-sm w-full" data-dom-id="transfer-btn" onclick="toggleTransferModal()">
+            转移团长
+          </button>
+          <button class="btn-danger py-2.5 px-4 text-sm w-full" data-dom-id="dissolve-btn" onclick="toggleDissolveModal()">
+            解散团队
+          </button>
+        </div>
+      </div>
+
+      <!-- 普通成员操作: 退出团队 -->
+      <div class="card p-5 mb-4 hidden" id="member-leave-actions">
+        <button class="btn-danger py-2.5 px-4 text-sm w-full" data-dom-id="leave-btn" onclick="toggleLeaveModal()">
+          退出团队
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ============================
+         VIEW: NO TEAM (未加入团队)
+         ============================ -->
+    <div id="no-team-view" class="hidden">
+
+      <!-- Empty State -->
+      <div class="card p-10 mb-4 text-center">
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-[var(--dm-muted)] flex items-center justify-center">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3 class="text-lg mb-2">还没有加入团队</h3>
+        <p class="text-sm text-[#8c7b6a] leading-relaxed">
+          创建属于你的团队，或加入已有团队，一起预约场地、参与文化活动。
+        </p>
+      </div>
+
+      <!-- Search -->
+      <div class="mb-4">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#a89885]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            class="input-field pl-10"
+            placeholder="搜索团队名称或团长昵称..."
+            data-dom-id="search-input"
+            id="search-input"
+            oninput="filterTeams()"
+          >
+        </div>
+      </div>
+
+      <!-- Search Results -->
+      <div id="search-results" class="hidden mb-4">
+        <div class="card divide-y divide-[var(--dm-border)]">
+          <div class="flex items-center px-5 py-4 gap-3" data-dom-id="search-result-1">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-primary)] flex items-center justify-center text-white font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">渔</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium">渔乡文艺社</span>
+              <p class="text-xs text-[#8c7b6a]">团长：陈团长 · 8 人</p>
+            </div>
+            <button class="btn-primary py-1.5 px-4 text-xs" onclick="joinTeam('渔乡文艺社')">申请加入</button>
+          </div>
+          <div class="flex items-center px-5 py-4 gap-3" data-dom-id="search-result-2">
+            <div class="w-10 h-10 rounded-full bg-[var(--dm-muted)] flex items-center justify-center text-[var(--dm-primary)] font-semibold text-sm shrink-0" style="font-family: 'Noto Serif SC', serif;">水</div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium">水乡戏剧社</span>
+              <p class="text-xs text-[#8c7b6a]">团长：林团长 · 12 人</p>
+            </div>
+            <button class="btn-primary py-1.5 px-4 text-xs" onclick="joinTeam('水乡戏剧社')">申请加入</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-3">
+        <button class="btn-primary py-3 px-4 text-base flex items-center justify-center gap-2" data-dom-id="create-team-btn" onclick="toggleCreateModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          创建团队
+        </button>
+        <button class="btn-outline py-3 px-4 text-base flex items-center justify-center gap-2" data-dom-id="join-team-btn" onclick="document.getElementById('search-input').focus()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          加入团队
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ============================
+       MODAL: 创建团队
+       ============================ -->
+  <div id="create-modal" class="modal-overlay hidden" onclick="closeOnOverlay(event, 'create-modal')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg">创建团队</h3>
+        <button onclick="closeModal('create-modal')" class="text-[#a89885] hover:text-[var(--dm-foreground)]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="text-sm font-medium text-[#6b5d50] block mb-1.5">你的昵称</label>
+          <input type="text" class="input-field" placeholder="请输入你的昵称" id="create-nickname">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-[#6b5d50] block mb-1.5">团队名称</label>
+          <input type="text" class="input-field" placeholder="请输入团队名称" id="create-team-name">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-[#6b5d50] block mb-1.5">团队简介</label>
+          <textarea class="input-field resize-none" rows="3" placeholder="介绍一下你的团队..." id="create-team-intro"></textarea>
+        </div>
+        <button class="btn-primary py-3 px-4 text-base w-full" onclick="createTeam()">
+          确认创建
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       MODAL: 解散团队
+       ============================ -->
+  <div id="dissolve-modal" class="modal-overlay hidden" onclick="closeOnOverlay(event, 'dissolve-modal')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="text-center mb-5">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-[#fdf0ed] flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4644a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h3 class="text-lg mb-2">确认解散团队</h3>
+        <p class="text-sm text-[#8c7b6a] leading-relaxed">
+          解散后，所有成员将被移除，团队数据将被清除。此操作不可撤销。
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button class="flex-1 py-2.5 px-4 text-sm rounded-[var(--dm-radius-medium)] bg-[var(--dm-muted)] text-[var(--dm-foreground)] font-medium" onclick="closeModal('dissolve-modal')">取消</button>
+        <button class="flex-1 py-2.5 px-4 text-sm rounded-[var(--dm-radius-medium)] bg-[#d4644a] text-white font-medium" onclick="dissolveTeam()">确认解散</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       MODAL: 转移团长
+       ============================ -->
+  <div id="transfer-modal" class="modal-overlay hidden" onclick="closeOnOverlay(event, 'transfer-modal')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg">转移团长</h3>
+        <button onclick="closeModal('transfer-modal')" class="text-[#a89885] hover:text-[var(--dm-foreground)]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-sm text-[#8c7b6a] mb-4">请选择要转移团长的成员：</p>
+      <div class="flex flex-col gap-2 mb-5">
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="radio" name="transfer-target" value="李副团" class="accent-[var(--dm-primary)] w-4 h-4">
+          <div>
+            <span class="text-sm font-medium">李副团</span>
+            <span class="badge badge-vice ml-2">副团长</span>
+          </div>
+        </label>
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="radio" name="transfer-target" value="张小渔" class="accent-[var(--dm-primary)] w-4 h-4">
+          <span class="text-sm font-medium">张小渔</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="radio" name="transfer-target" value="王水乡" class="accent-[var(--dm-primary)] w-4 h-4">
+          <span class="text-sm font-medium">王水乡</span>
+        </label>
+      </div>
+      <button class="btn-primary py-3 px-4 text-base w-full" onclick="transferLeader()">
+        确认转移
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================
+       MODAL: 退出团队
+       ============================ -->
+  <div id="leave-modal" class="modal-overlay hidden" onclick="closeOnOverlay(event, 'leave-modal')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="text-center mb-5">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-[#fdf0ed] flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4644a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </div>
+        <h3 class="text-lg mb-2">确认退出团队</h3>
+        <p class="text-sm text-[#8c7b6a] leading-relaxed">
+          退出后你将不再是团队的一员，将无法代表团队预约场地。
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button class="flex-1 py-2.5 px-4 text-sm rounded-[var(--dm-radius-medium)] bg-[var(--dm-muted)] text-[var(--dm-foreground)] font-medium" onclick="closeModal('leave-modal')">取消</button>
+        <button class="flex-1 py-2.5 px-4 text-sm rounded-[var(--dm-radius-medium)] bg-[#d4644a] text-white font-medium" onclick="leaveTeam()">确认退出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       MODAL: 设置副团长
+       ============================ -->
+  <div id="vice-leader-modal" class="modal-overlay hidden" onclick="closeOnOverlay(event, 'vice-leader-modal')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg">设置副团长</h3>
+        <button onclick="closeModal('vice-leader-modal')" class="text-[#a89885] hover:text-[var(--dm-foreground)]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-sm text-[#8c7b6a] mb-4">选择要设为副团长的成员（可设置多名）：</p>
+      <div class="flex flex-col gap-2 mb-5">
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="checkbox" class="accent-[var(--dm-primary)] w-4 h-4" checked>
+          <div>
+            <span class="text-sm font-medium">李副团</span>
+            <span class="badge badge-vice ml-2">副团长</span>
+          </div>
+        </label>
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="checkbox" class="accent-[var(--dm-primary)] w-4 h-4">
+          <span class="text-sm font-medium">张小渔</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] cursor-pointer hover:bg-[var(--dm-muted)] transition-colors">
+          <input type="checkbox" class="accent-[var(--dm-primary)] w-4 h-4">
+          <span class="text-sm font-medium">王水乡</span>
+        </label>
+      </div>
+      <button class="btn-primary py-3 px-4 text-base w-full" onclick="saveViceLeaders()">
+        保存设置
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================
+       BOTTOM NAVIGATION
+       ============================ -->
+  <nav data-mobile-nav="global" class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--dm-border)] h-[56px] safe-area-bottom">
+    <div class="w-full max-w-md mx-auto grid grid-cols-4 h-full">
+      <!-- 首页 -->
+      <a href="index.html" data-nav-key="home" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline">
+        <svg class="nav-icon w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="nav-label text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span>
+      </a>
+
+      <!-- 团队 -->
+      <a href="team.html" data-nav-key="team" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline">
+        <svg class="nav-icon w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <span class="nav-label text-[11px] leading-none whitespace-nowrap max-w-full truncate">团队</span>
+      </a>
+
+      <!-- 预约 -->
+      <a href="bookings.html" data-nav-key="bookings" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline">
+        <svg class="nav-icon w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span class="nav-label text-[11px] leading-none whitespace-nowrap max-w-full truncate">预约</span>
+      </a>
+
+      <!-- 我的 -->
+      <a href="profile.html" data-nav-key="profile" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline">
+        <svg class="nav-icon w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="nav-label text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============================
+       SCRIPTS
+       ============================ -->
+  <script>
+    // --- View Toggle ---
+    // Default: show has-team view (demonstrate the joined state)
+    // Switch to 'no-team' by calling: switchView('no-team')
+    function switchView(view) {
+      var hasTeam = document.getElementById('has-team-view');
+      var noTeam = document.getElementById('no-team-view');
+      if (view === 'no-team') {
+        hasTeam.classList.add('hidden');
+        noTeam.classList.remove('hidden');
+      } else {
+        hasTeam.classList.remove('hidden');
+        noTeam.classList.add('hidden');
+      }
+    }
+
+    // --- Modal Helpers ---
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function closeOnOverlay(event, id) {
+      if (event.target === event.currentTarget) {
+        closeModal(id);
+      }
+    }
+
+    // --- Modal Toggles ---
+    function toggleCreateModal() { openModal('create-modal'); }
+    function toggleDissolveModal() { openModal('dissolve-modal'); }
+    function toggleTransferModal() { openModal('transfer-modal'); }
+    function toggleLeaveModal() { openModal('leave-modal'); }
+    function toggleViceLeaderModal() { openModal('vice-leader-modal'); }
+
+    // --- Search ---
+    function filterTeams() {
+      var input = document.getElementById('search-input');
+      var results = document.getElementById('search-results');
+      if (input.value.trim().length > 0) {
+        results.classList.remove('hidden');
+      } else {
+        results.classList.add('hidden');
+      }
+    }
+
+    // --- Actions ---
+    function createTeam() {
+      var nickname = document.getElementById('create-nickname').value.trim();
+      var teamName = document.getElementById('create-team-name').value.trim();
+      var intro = document.getElementById('create-team-intro').value.trim();
+      if (!nickname || !teamName) {
+        alert('请填写昵称和团队名称');
+        return;
+      }
+      alert('团队 "' + teamName + '" 创建成功！');
+      closeModal('create-modal');
+      switchView('has-team');
+    }
+
+    function joinTeam(name) {
+      alert('已向 "' + name + '" 发送加入申请，请等待团长审核。');
+    }
+
+    function dissolveTeam() {
+      alert('团队已解散');
+      closeModal('dissolve-modal');
+      switchView('no-team');
+    }
+
+    function transferLeader() {
+      var selected = document.querySelector('input[name="transfer-target"]:checked');
+      if (!selected) {
+        alert('请选择要转移团长的成员');
+        return;
+      }
+      alert('团长已转移给 ' + selected.value);
+      closeModal('transfer-modal');
+    }
+
+    function leaveTeam() {
+      alert('你已退出团队');
+      closeModal('leave-modal');
+      switchView('no-team');
+    }
+
+    function saveViceLeaders() {
+      alert('副团长设置已保存');
+      closeModal('vice-leader-modal');
+    }
+  </script>
+
+</body>
+</html>

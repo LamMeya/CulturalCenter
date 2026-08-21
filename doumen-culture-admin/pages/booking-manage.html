@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>预约管理 — 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+      --state-success: #4caf7d;
+      --state-warning: #e8a840;
+      --state-error: #d4644a;
+      --state-info: #5b9ecf;
+      --font-heading: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'Songti SC', serif;
+      --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+    }
+    body {
+      font-family: var(--font-body);
+      background: var(--dm-background);
+      color: var(--dm-foreground);
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-heading { font-family: var(--font-heading); }
+    .sidebar-link {
+      transition: all 0.2s ease;
+    }
+    .sidebar-link:hover {
+      background: rgba(61, 142, 122, 0.08);
+    }
+    .sidebar-link.active {
+      background: rgba(61, 142, 122, 0.12);
+      color: var(--dm-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--dm-primary);
+    }
+    .btn-primary {
+      background: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+      border-radius: var(--dm-radius-medium);
+      padding: 8px 20px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+    .btn-primary:hover {
+      background: #2e7262;
+      box-shadow: 0 2px 8px rgba(61, 142, 122, 0.3);
+    }
+    .btn-primary:disabled {
+      background: #b9ddd1;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--dm-primary);
+      border: 1.5px solid var(--dm-primary);
+      border-radius: var(--dm-radius-medium);
+      padding: 7px 18px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-outline:hover {
+      background: rgba(61, 142, 122, 0.06);
+    }
+    .btn-warning {
+      background: var(--state-warning);
+      color: #fff;
+      border-radius: var(--dm-radius-medium);
+      padding: 8px 20px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+    .btn-warning:hover {
+      background: #d4952e;
+      box-shadow: 0 2px 8px rgba(232, 168, 64, 0.3);
+    }
+    .btn-danger {
+      background: transparent;
+      color: var(--state-error);
+      border: 1.5px solid var(--state-error);
+      border-radius: var(--dm-radius-medium);
+      padding: 5px 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-danger:hover {
+      background: var(--state-error);
+      color: #fff;
+    }
+    .btn-sm {
+      padding: 4px 12px;
+      font-size: 13px;
+    }
+    .card {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg);
+      border: 1px solid var(--dm-border);
+      box-shadow: 0 1px 3px rgba(33, 28, 24, 0.04);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      background: var(--dm-muted);
+      color: #6b5d50;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--dm-border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--dm-border);
+      color: var(--dm-foreground);
+    }
+    tbody tr:hover {
+      background: rgba(61, 142, 122, 0.03);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .status-pending { background: #fdf6e8; color: #b8811a; }
+    .status-won { background: #e8f5ee; color: #2d7a4a; }
+    .status-lost { background: #fdf0ed; color: #b8452e; }
+    .status-cancelled { background: #f5f0eb; color: #8c7b6a; }
+    .privilege-card {
+      background: linear-gradient(135deg, rgba(61, 142, 122, 0.06), rgba(61, 142, 122, 0.02));
+      border: 1px solid rgba(61, 142, 122, 0.15);
+    }
+    .privilege-count {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dm-primary);
+      line-height: 1;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(33, 28, 24, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-content {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg);
+      padding: 28px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(33, 28, 24, 0.15);
+      border: 1px solid var(--dm-border);
+    }
+    .modal-content h3 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+    select, input[type="date"] {
+      background: var(--dm-card);
+      border: 1.5px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      padding: 8px 12px;
+      font-size: 14px;
+      color: var(--dm-foreground);
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    select:focus, input[type="date"]:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px rgba(61, 142, 122, 0.1);
+    }
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: var(--dm-card);
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      padding: 12px 20px;
+      box-shadow: 0 4px 16px rgba(33, 28, 24, 0.12);
+      font-size: 14px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.hidden { display: none; }
+    .toast.success { border-left: 4px solid var(--state-success); }
+    .toast.error { border-left: 4px solid var(--state-error); }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="w-56 flex-shrink-0 bg-white border-r" style="border-color: var(--dm-border); min-height: 100vh;">
+    <div class="px-5 py-6 border-b" style="border-color: var(--dm-border);">
+      <h1 class="font-heading font-semibold text-lg tracking-wide" style="color: var(--dm-primary);">斗门文化中心</h1>
+      <p class="text-xs mt-1" style="color: #8c7b6a;">后台管理系统</p>
+    </div>
+    <nav class="py-3">
+      <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-5 py-3 text-sm" style="color: #6b5d50;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        工作台
+      </a>
+      <a href="venue-manage.html" class="sidebar-link flex items-center gap-3 px-5 py-3 text-sm" style="color: #6b5d50;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        场地管理
+      </a>
+      <a href="booking-manage.html" class="sidebar-link active flex items-center gap-3 px-5 py-3 text-sm">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        预约管理
+      </a>
+      <a href="time-slots.html" class="sidebar-link flex items-center gap-3 px-5 py-3 text-sm" style="color: #6b5d50;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        时间段设置
+      </a>
+      <a href="notifications.html" class="sidebar-link flex items-center gap-3 px-5 py-3 text-sm" style="color: #6b5d50;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        通知管理
+      </a>
+      <a href="admin-users.html" class="sidebar-link flex items-center gap-3 px-5 py-3 text-sm" style="color: #6b5d50;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        管理员管理
+      </a>
+    </nav>
+    <div class="px-5 py-4 border-t" style="border-color: var(--dm-border); margin-top: auto;">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style="background: var(--dm-primary);">管</div>
+        <div>
+          <p class="text-sm font-medium">张三</p>
+          <p class="text-xs" style="color: #8c7b6a;">超级管理员</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <main class="flex-1 p-8 overflow-y-auto" style="min-height: 100vh;">
+
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="font-heading font-semibold text-2xl" style="color: var(--dm-foreground);">预约管理</h2>
+        <p class="text-sm mt-1" style="color: #8c7b6a;">管理场地预约、执行抽签及处理取消操作</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn-outline" onclick="handleRefresh()">刷新数据</button>
+      </div>
+    </div>
+
+    <!-- ===== Privilege Draw Section ===== -->
+    <div class="card privilege-card p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <div>
+            <p class="text-xs uppercase tracking-wider font-medium" style="color: #8c7b6a;">当前角色</p>
+            <p class="font-heading font-semibold text-lg mt-0.5" style="color: var(--dm-foreground);">超级管理员</p>
+          </div>
+          <div class="w-px h-10" style="background: var(--dm-border);"></div>
+          <div>
+            <p class="text-xs uppercase tracking-wider font-medium" style="color: #8c7b6a;">特权剩余次数</p>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span class="privilege-count" id="privilege-remaining">4</span>
+              <span class="text-sm" style="color: #8c7b6a;">/ 4 次</span>
+            </div>
+          </div>
+          <div class="w-px h-10" style="background: var(--dm-border);"></div>
+          <div>
+            <p class="text-xs uppercase tracking-wider font-medium" style="color: #8c7b6a;">角色特权说明</p>
+            <p class="text-sm mt-0.5" style="color: #6b5d50;">超管 4次 ｜ 管理员 2次 ｜ 操作员 1次</p>
+          </div>
+        </div>
+        <button class="btn-warning" data-dom-id="privilege-draw-btn" onclick="openPrivilegeDraw()" id="btn-privilege-draw">
+          <span class="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            特权抽签
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== Filter Section ===== -->
+    <div class="card p-5 mb-6">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium" style="color: #6b5d50;">场地</label>
+          <select data-dom-id="filter-selects" id="filter-venue" onchange="applyFilters()">
+            <option value="">全部场地</option>
+            <option value="多功能厅">多功能厅</option>
+            <option value="排练室A">排练室 A</option>
+            <option value="排练室B">排练室 B</option>
+            <option value="展览厅">展览厅</option>
+            <option value="小剧场">小剧场</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium" style="color: #6b5d50;">状态</label>
+          <select data-dom-id="filter-selects" id="filter-status" onchange="applyFilters()">
+            <option value="">全部状态</option>
+            <option value="pending">待抽签</option>
+            <option value="won">已中签</option>
+            <option value="lost">未中签</option>
+            <option value="cancelled">已取消</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium" style="color: #6b5d50;">日期</label>
+          <input type="date" data-dom-id="filter-selects" id="filter-date" onchange="applyFilters()" />
+        </div>
+        <button class="btn-outline btn-sm" onclick="clearFilters()">清除筛选</button>
+      </div>
+    </div>
+
+    <!-- ===== Action Bar ===== -->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-sm" style="color: #6b5d50;" id="table-count">共 <strong>8</strong> 条预约记录</p>
+      <div class="flex items-center gap-3">
+        <button class="btn-primary" data-dom-id="auto-draw-btn" onclick="executeAutoDraw()" id="btn-auto-draw">
+          <span class="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+            执行自动抽签
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== Booking Table ===== -->
+    <div class="card table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>场地名称</th>
+            <th>预约团队</th>
+            <th>预约日期</th>
+            <th>时间段</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="booking-table-body">
+          <!-- Rows will be populated by JS -->
+        </tbody>
+      </table>
+      <div id="table-empty" class="hidden py-16 text-center">
+        <p style="color: #8c7b6a;">暂无匹配的预约记录</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===== Draw Result Modal ===== -->
+  <div class="modal-overlay hidden" data-dom-id="draw-result-modal" id="modal-draw-result">
+    <div class="modal-content">
+      <h3>抽签结果</h3>
+      <div id="draw-result-content" class="mb-6">
+        <!-- Dynamic content -->
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="btn-outline" onclick="closeModal('modal-draw-result')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Privilege Draw Modal ===== -->
+  <div class="modal-overlay hidden" id="modal-privilege-draw">
+    <div class="modal-content">
+      <h3>特权抽签</h3>
+      <p class="text-sm mb-4" style="color: #6b5d50;">选择待抽签的团队预约，使用特权进行抽签。剩余特权次数：<strong id="modal-privilege-count">4</strong> 次。</p>
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-2" style="color: #6b5d50;">选择待抽签预约</label>
+        <select id="privilege-select" class="w-full">
+          <option value="">请选择预约记录</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="btn-outline" onclick="closeModal('modal-privilege-draw')">取消</button>
+        <button class="btn-primary" onclick="confirmPrivilegeDraw()">确认抽签</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Cancel Booking Modal ===== -->
+  <div class="modal-overlay hidden" id="modal-cancel">
+    <div class="modal-content">
+      <h3>取消预约</h3>
+      <p class="text-sm mb-4" style="color: #6b5d50;">请选择取消原因（若为已中签预约取消，系统将自动重新抽签）：</p>
+      <div class="mb-4">
+        <label class="text-sm font-medium block mb-2" style="color: #6b5d50;">取消原因</label>
+        <select id="cancel-reason" class="w-full">
+          <option value="">请选择原因</option>
+          <option value="team-cancel">团队主动取消</option>
+          <option value="admin-cancel">管理员取消</option>
+          <option value="conflict">场地冲突</option>
+          <option value="other">其他原因</option>
+        </select>
+      </div>
+      <p class="text-xs mb-4 p-3 rounded" style="background: #fdf0ed; color: #b8452e;" id="cancel-warning">
+        注意：若取消已中签的预约，系统将自动从该时段剩余待抽签预约中重新抽取。
+      </p>
+      <div class="flex justify-end gap-3">
+        <button class="btn-outline" onclick="closeModal('modal-cancel')">返回</button>
+        <button class="btn-danger" style="background: var(--state-error); color: #fff; border: none;" data-dom-id="cancel-booking-btn" onclick="confirmCancel()">确认取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script>
+    // ===== Mock Data =====
+    let bookings = [
+      { id: 1, venue: '多功能厅', team: '粤剧社团', date: '2026-08-15', timeSlot: '09:00 - 12:00', status: 'won' },
+      { id: 2, venue: '排练室A', team: '舞蹈队', date: '2026-08-15', timeSlot: '14:00 - 17:00', status: 'pending' },
+      { id: 3, venue: '小剧场', team: '合唱团', date: '2026-08-16', timeSlot: '09:00 - 12:00', status: 'pending' },
+      { id: 4, venue: '展览厅', team: '书法协会', date: '2026-08-16', timeSlot: '14:00 - 17:00', status: 'lost' },
+      { id: 5, venue: '多功能厅', team: '青年话剧社', date: '2026-08-17', timeSlot: '09:00 - 12:00', status: 'pending' },
+      { id: 6, venue: '排练室B', team: '民乐队', date: '2026-08-17', timeSlot: '14:00 - 17:00', status: 'cancelled' },
+      { id: 7, venue: '排练室A', team: '少儿艺术团', date: '2026-08-18', timeSlot: '09:00 - 12:00', status: 'pending' },
+      { id: 8, venue: '小剧场', team: '摄影俱乐部', date: '2026-08-18', timeSlot: '14:00 - 17:00', status: 'pending' },
+    ];
+
+    let currentRole = 'super'; // 'super' | 'admin' | 'operator'
+    let privilegeRemaining = 4; // 超管4 / 管理员2 / 操作员1
+    let currentCancelId = null;
+
+    const roleConfig = {
+      super: { name: '超级管理员', maxPrivilege: 4 },
+      admin: { name: '管理员', maxPrivilege: 2 },
+      operator: { name: '操作员', maxPrivilege: 1 },
+    };
+
+    const statusMap = {
+      pending: { label: '待抽签', cls: 'status-pending' },
+      won: { label: '已中签', cls: 'status-won' },
+      lost: { label: '未中签', cls: 'status-lost' },
+      cancelled: { label: '已取消', cls: 'status-cancelled' },
+    };
+
+    // ===== Render =====
+    function renderTable(data) {
+      const tbody = document.getElementById('booking-table-body');
+      const empty = document.getElementById('table-empty');
+      const count = document.getElementById('table-count');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        count.innerHTML = '共 <strong>0</strong> 条预约记录';
+        return;
+      }
+
+      empty.classList.add('hidden');
+      count.innerHTML = '共 <strong>' + data.length + '</strong> 条预约记录';
+
+      tbody.innerHTML = data.map(b => {
+        const st = statusMap[b.status];
+        const canCancel = b.status === 'won' || b.status === 'pending';
+        return `
+          <tr>
+            <td><span class="font-medium">${b.venue}</span></td>
+            <td>${b.team}</td>
+            <td>${b.date}</td>
+            <td>${b.timeSlot}</td>
+            <td><span class="status-badge ${st.cls}">${st.label}</span></td>
+            <td>
+              <div class="flex items-center gap-2">
+                ${canCancel ? `<button class="btn-danger btn-sm" data-dom-id="cancel-booking-btn" onclick="openCancel(${b.id})">取消</button>` : '<span style="color: #bfb0a0; font-size: 13px;">—</span>'}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function applyFilters() {
+      const venue = document.getElementById('filter-venue').value;
+      const status = document.getElementById('filter-status').value;
+      const date = document.getElementById('filter-date').value;
+
+      let filtered = bookings;
+      if (venue) filtered = filtered.filter(b => b.venue === venue);
+      if (status) filtered = filtered.filter(b => b.status === status);
+      if (date) filtered = filtered.filter(b => b.date === date);
+
+      renderTable(filtered);
+    }
+
+    function clearFilters() {
+      document.getElementById('filter-venue').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-date').value = '';
+      renderTable(bookings);
+    }
+
+    function handleRefresh() {
+      clearFilters();
+      showToast('数据已刷新', 'success');
+    }
+
+    // ===== Auto Draw =====
+    function executeAutoDraw() {
+      const pending = bookings.filter(b => b.status === 'pending');
+      if (pending.length === 0) {
+        showToast('当前没有待抽签的预约', 'error');
+        return;
+      }
+
+      let wonCount = 0, lostCount = 0;
+      pending.forEach(b => {
+        // Simulate: 50% chance to win
+        if (Math.random() < 0.5) {
+          b.status = 'won';
+          wonCount++;
+        } else {
+          b.status = 'lost';
+          lostCount++;
+        }
+      });
+
+      applyFilters();
+      showResultModal('自动抽签完成', '已处理 <strong>' + pending.length + '</strong> 条待抽签预约，其中 <span style="color:var(--state-success);">已中签 ' + wonCount + ' 条</span>，<span style="color:var(--state-error);">未中签 ' + lostCount + ' 条</span>。');
+      showToast('自动抽签执行完毕', 'success');
+    }
+
+    // ===== Privilege Draw =====
+    function openPrivilegeDraw() {
+      if (privilegeRemaining <= 0) {
+        showToast('特权次数已用完', 'error');
+        return;
+      }
+
+      const pending = bookings.filter(b => b.status === 'pending');
+      if (pending.length === 0) {
+        showToast('当前没有待抽签的预约', 'error');
+        return;
+      }
+
+      const sel = document.getElementById('privilege-select');
+      sel.innerHTML = '<option value="">请选择预约记录</option>' +
+        pending.map(b => `<option value="${b.id}">${b.venue} — ${b.team}（${b.date} ${b.timeSlot}）</option>`).join('');
+
+      document.getElementById('modal-privilege-count').textContent = privilegeRemaining;
+      document.getElementById('modal-privilege-draw').classList.remove('hidden');
+    }
+
+    function confirmPrivilegeDraw() {
+      const sel = document.getElementById('privilege-select');
+      const id = parseInt(sel.value);
+      if (!id) {
+        showToast('请先选择一条预约记录', 'error');
+        return;
+      }
+
+      const booking = bookings.find(b => b.id === id);
+      if (!booking || booking.status !== 'pending') {
+        showToast('该预约已不是待抽签状态', 'error');
+        return;
+      }
+
+      // Simulate privilege draw (high success rate ~90%)
+      const won = Math.random() < 0.9;
+      booking.status = won ? 'won' : 'lost';
+      privilegeRemaining--;
+      document.getElementById('privilege-remaining').textContent = privilegeRemaining;
+
+      closeModal('modal-privilege-draw');
+      applyFilters();
+      showResultModal('特权抽签完成',
+        '团队 <strong>' + booking.team + '</strong> 在 <strong>' + booking.venue + '</strong> 的预约：<span style="color:' + (won ? 'var(--state-success)' : 'var(--state-error)') + ';">' + (won ? '已中签' : '未中签') + '</span>。<br>剩余特权次数：<strong>' + privilegeRemaining + '</strong> 次。');
+      showToast('特权抽签完成', 'success');
+
+      if (privilegeRemaining <= 0) {
+        document.getElementById('btn-privilege-draw').disabled = true;
+      }
+    }
+
+    // ===== Cancel Booking =====
+    function openCancel(id) {
+      currentCancelId = id;
+      const booking = bookings.find(b => b.id === id);
+      const warning = document.getElementById('cancel-warning');
+      if (booking && booking.status === 'won') {
+        warning.classList.remove('hidden');
+      } else {
+        warning.classList.add('hidden');
+      }
+      document.getElementById('cancel-reason').value = '';
+      document.getElementById('modal-cancel').classList.remove('hidden');
+    }
+
+    function confirmCancel() {
+      const reason = document.getElementById('cancel-reason').value;
+      if (!reason) {
+        showToast('请选择取消原因', 'error');
+        return;
+      }
+
+      const booking = bookings.find(b => b.id === currentCancelId);
+      if (!booking) return;
+
+      const wasWon = booking.status === 'won';
+      booking.status = 'cancelled';
+
+      // If was won, re-draw from remaining pending for same slot
+      if (wasWon) {
+        const sameSlotPending = bookings.filter(b =>
+          b.status === 'pending' && b.venue === booking.venue && b.date === booking.date && b.timeSlot === booking.timeSlot
+        );
+        if (sameSlotPending.length > 0) {
+          const winner = sameSlotPending[Math.floor(Math.random() * sameSlotPending.length)];
+          winner.status = 'won';
+          closeModal('modal-cancel');
+          applyFilters();
+          showResultModal('取消并重新抽签',
+            '团队 <strong>' + booking.team + '</strong> 的预约已取消。<br>已自动重新抽签，团队 <strong>' + winner.team + '</strong> 中签。');
+          showToast('预约已取消，已重新抽签', 'success');
+          return;
+        }
+      }
+
+      closeModal('modal-cancel');
+      applyFilters();
+      showToast('预约已取消', 'success');
+    }
+
+    // ===== Modal =====
+    function showResultModal(title, content) {
+      const modal = document.getElementById('modal-draw-result');
+      document.querySelector('#modal-draw-result h3').textContent = title;
+      document.getElementById('draw-result-content').innerHTML = '<p style="line-height:1.8;">' + content + '</p>';
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.add('hidden');
+        }
+      });
+    });
+
+    // ===== Toast =====
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + type;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // ===== Initial Render =====
+    renderTable(bookings);
+  </script>
+</body>
+</html>

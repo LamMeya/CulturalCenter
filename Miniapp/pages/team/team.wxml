@@ -1,0 +1,342 @@
+<!-- pages/team/team.wxml — 团队管理 -->
+<view class="page-team">
+
+  <!-- 未登录提示 -->
+  <view class="login-prompt" wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt-icon">🔒</view>
+    <text class="login-prompt-title">查看团队需要登录</text>
+    <text class="login-prompt-desc">登录后可创建或加入团队，开始预约场馆</text>
+    <view class="login-prompt-btn" bindtap="onGoToLogin">去登录</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{isLoggedIn && loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载团队信息...</text>
+  </view>
+
+  <!-- ==================== 无团队状态 ==================== -->
+  <block wx:if="{{isLoggedIn && !loading && !hasTeam}}">
+
+    <!-- 空状态提示 -->
+    <view class="empty-hero">
+      <view class="empty-wave">
+        <view class="ew-1"></view>
+        <view class="ew-2"></view>
+      </view>
+      <text class="empty-icon">👥</text>
+      <text class="empty-title">您还没有加入团队</text>
+      <text class="empty-desc">创建或加入一个团队，开始预约场馆</text>
+    </view>
+
+    <!-- 创建团队 -->
+    <view class="action-card">
+      <view class="action-header" bindtap="onToggleCreateForm">
+        <view class="action-icon create-icon">＋</view>
+        <view class="action-info">
+          <text class="action-title">创建新团队</text>
+          <text class="action-desc">成为队长，邀请成员加入</text>
+        </view>
+        <text class="action-arrow {{showCreateForm ? 'arrow-up' : ''}}">⟩</text>
+      </view>
+
+      <!-- 创建表单 -->
+      <view class="create-form" wx:if="{{showCreateForm}}">
+        <view class="form-item">
+          <text class="form-label">团队名称</text>
+          <input
+            class="form-input"
+            placeholder="请输入团队名称"
+            value="{{teamName}}"
+            bindinput="onTeamNameInput"
+            maxlength="20"
+          />
+        </view>
+        <view class="form-item">
+          <text class="form-label">团队简介</text>
+          <textarea
+            class="form-textarea"
+            placeholder="介绍一下您的团队（选填）"
+            value="{{teamIntro}}"
+            bindinput="onTeamIntroInput"
+            maxlength="100"
+            auto-height
+          />
+        </view>
+        <view class="btn-primary {{creating ? 'btn-loading' : ''}}" bindtap="onCreateTeam">
+          {{creating ? '创建中...' : '确认创建'}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 搜索/加入团队 -->
+    <view class="action-card">
+      <view class="action-header">
+        <view class="action-icon join-icon">🔍</view>
+        <view class="action-info">
+          <text class="action-title">搜索并加入团队</text>
+          <text class="action-desc">通过关键词查找已有团队</text>
+        </view>
+      </view>
+
+      <view class="search-box">
+        <input
+          class="search-input"
+          placeholder="输入团队名称关键词"
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+          confirm-type="search"
+          bindconfirm="onSearchTeam"
+        />
+        <view class="btn-search" bindtap="onSearchTeam">搜索</view>
+      </view>
+
+      <!-- 搜索结果 -->
+      <view class="search-results" wx:if="{{searching}}">
+        <view class="loading-spinner small"></view>
+        <text>搜索中...</text>
+      </view>
+
+      <view class="search-results" wx:if="{{!searching && searchResults.length > 0}}">
+        <view
+          class="result-item"
+          wx:for="{{searchResults}}"
+          wx:key="id"
+        >
+          <view class="result-info">
+            <text class="result-name">{{item.name}}</text>
+            <text class="result-intro" wx:if="{{item.intro}}">{{item.intro}}</text>
+            <text class="result-meta">成员 {{item.member_count || 0}} 人</text>
+          </view>
+          <view
+            class="btn-join {{joiningTeamId === item.id ? 'btn-loading' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onJoinTeam"
+          >
+            {{joiningTeamId === item.id ? '加入中' : '加入'}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ==================== 有团队状态 ==================== -->
+  <block wx:if="{{isLoggedIn && !loading && hasTeam && team}}">
+
+    <!-- 团队信息卡片 -->
+    <view class="team-card">
+      <view class="team-card-header">
+        <view class="team-avatar">
+          <text>{{team.name ? team.name.charAt(0) : 'T'}}</text>
+        </view>
+        <view class="team-card-info">
+          <view class="team-name-row">
+            <text class="team-name">{{team.name}}</text>
+            <text class="team-role-badge" wx:if="{{isLeader}}">队长</text>
+            <text class="team-role-badge vice" wx:elif="{{isViceLeader}}">副队长</text>
+          </view>
+          <text class="team-intro" wx:if="{{team.intro}}">{{team.intro}}</text>
+          <text class="team-member-count">成员 {{members.length || team.member_count || 0}} 人</text>
+        </view>
+      </view>
+
+      <!-- 预约统计 -->
+      <view class="team-stats" wx:if="{{bookingStats}}">
+        <view class="stats-bar" bindtap="onToggleStatsDetail">
+          <text class="stats-label">预约统计</text>
+          <text class="stats-arrow {{showStatsDetail ? 'arrow-up' : ''}}">⟩</text>
+        </view>
+
+        <view class="stats-summary">
+          <view class="stat-item">
+            <text class="stat-num {{bookingStats.success_count_2w >= 2 ? 'stat-warn' : ''}}">
+              {{bookingStats.success_count_2w || 0}}
+            </text>
+            <text class="stat-desc">近2周成功</text>
+            <text class="stat-max">/2</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-num {{bookingStats.cancel_count_30d >= 2 ? 'stat-warn' : ''}}">
+              {{bookingStats.cancel_count_30d || 0}}
+            </text>
+            <text class="stat-desc">近30天取消</text>
+            <text class="stat-max">/2</text>
+          </view>
+        </view>
+
+        <view class="stats-detail" wx:if="{{showStatsDetail}}">
+          <view class="sd-row">
+            <text class="sd-label">近2周成功预约</text>
+            <text class="sd-value">{{bookingStats.success_count_2w || 0}} 次</text>
+          </view>
+          <view class="sd-row">
+            <text class="sd-label">近30天取消预约</text>
+            <text class="sd-value">{{bookingStats.cancel_count_30d || 0}} 次</text>
+          </view>
+          <view class="sd-row" wx:if="{{bookingStats.total_bookings !== undefined}}">
+            <text class="sd-label">累计预约</text>
+            <text class="sd-value">{{bookingStats.total_bookings}} 次</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 成员列表 -->
+    <view class="section-card">
+      <view class="section-bar" bindtap="onToggleMemberList">
+        <text class="section-title">团队成员</text>
+        <view class="section-right">
+          <text class="section-count">{{members.length || team.member_count || 0}} 人</text>
+          <text class="section-arrow {{showMemberList ? 'arrow-up' : ''}}">⟩</text>
+        </view>
+      </view>
+
+      <view class="member-list" wx:if="{{showMemberList}}">
+        <view
+          class="member-item"
+          wx:for="{{members}}"
+          wx:key="user_id"
+        >
+          <view class="member-avatar">
+            <text>{{item.nickname ? item.nickname.charAt(0) : '?'}}</text>
+          </view>
+          <view class="member-info">
+            <view class="member-name-row">
+              <text class="member-name">{{item.nickname || '成员'}}</text>
+              <text class="member-role leader" wx:if="{{item.user_id === team.leader_user_id}}">队长</text>
+              <text class="member-role vice" wx:elif="{{currentViceLeaderIds.indexOf(item.user_id) >= 0}}">副队长</text>
+            </view>
+            <text class="member-phone" wx:if="{{item.phone}}">{{item.phone}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 队长操作 -->
+    <view class="section-card" wx:if="{{isLeader}}">
+      <view class="section-bar">
+        <text class="section-title">队长管理</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item" bindtap="onOpenViceLeaderModal">
+          <text class="ai-icon">👑</text>
+          <text class="ai-text">设置副队长</text>
+          <text class="ai-hint">最多4名</text>
+          <text class="ai-arrow">⟩</text>
+        </view>
+        <view class="action-item" bindtap="onOpenTransferModal">
+          <text class="ai-icon">🔄</text>
+          <text class="ai-text">转让队长</text>
+          <text class="ai-hint">选择新队长</text>
+          <text class="ai-arrow">⟩</text>
+        </view>
+        <view class="action-item action-danger" bindtap="onOpenDissolveModal">
+          <text class="ai-icon">⚠️</text>
+          <text class="ai-text danger-text">解散团队</text>
+          <text class="ai-hint">不可撤销</text>
+          <text class="ai-arrow">⟩</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 成员操作 -->
+    <view class="section-card" wx:if="{{!isLeader}}">
+      <view class="section-bar">
+        <text class="section-title">成员操作</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item action-danger" bindtap="onOpenLeaveModal">
+          <text class="ai-icon">🚪</text>
+          <text class="ai-text danger-text">退出团队</text>
+          <text class="ai-hint">退出后可重新加入</text>
+          <text class="ai-arrow">⟩</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ==================== 弹窗：设置副队长 ==================== -->
+  <view class="modal-mask" wx:if="{{showViceLeaderModal}}" bindtap="onCloseViceLeaderModal">
+    <view class="modal-content" catchtap>
+      <text class="modal-title">设置副队长</text>
+      <text class="modal-desc">选择最多 4 名副队长</text>
+
+      <scroll-view class="vice-list" scroll-y>
+        <view
+          class="vice-item {{selectedViceLeaderIds.indexOf(item.user_id) >= 0 ? 'vice-selected' : ''}}"
+          wx:for="{{potentialViceLeaders}}"
+          wx:key="user_id"
+          data-user-id="{{item.user_id}}"
+          bindtap="onToggleViceLeader"
+        >
+          <view class="vice-avatar">
+            <text>{{item.nickname ? item.nickname.charAt(0) : '?'}}</text>
+          </view>
+          <text class="vice-name">{{item.nickname || '成员'}}</text>
+          <view class="vice-check" wx:if="{{selectedViceLeaderIds.indexOf(item.user_id) >= 0}}">✓</view>
+        </view>
+      </scroll-view>
+
+      <view class="modal-actions">
+        <view class="btn-cancel" bindtap="onCloseViceLeaderModal">取消</view>
+        <view class="btn-submit" bindtap="onConfirmViceLeaders">确认</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 弹窗：转让队长 -->
+  <view class="modal-mask" wx:if="{{showTransferModal}}" bindtap="onCloseTransferModal">
+    <view class="modal-content" catchtap>
+      <text class="modal-title">转让队长</text>
+      <text class="modal-desc">选择一位成员接任队长</text>
+
+      <scroll-view class="vice-list" scroll-y>
+        <view
+          class="vice-item"
+          wx:for="{{transferCandidates}}"
+          wx:key="user_id"
+          data-user-id="{{item.user_id}}"
+          bindtap="onTransferLeader"
+        >
+          <view class="vice-avatar">
+            <text>{{item.nickname ? item.nickname.charAt(0) : '?'}}</text>
+          </view>
+          <text class="vice-name">{{item.nickname || '成员'}}</text>
+        </view>
+      </scroll-view>
+
+      <view class="modal-actions">
+        <view class="btn-cancel" bindtap="onCloseTransferModal">取消</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 弹窗：解散团队 -->
+  <view class="modal-mask" wx:if="{{showDissolveModal}}" bindtap="onCloseDissolveModal">
+    <view class="modal-content" catchtap>
+      <text class="modal-title">解散团队</text>
+      <text class="modal-desc danger-desc">此操作不可撤销！团队的所有数据和预约记录将被清除。确认要解散团队吗？</text>
+
+      <view class="modal-actions">
+        <view class="btn-cancel" bindtap="onCloseDissolveModal">取消</view>
+        <view class="btn-danger" bindtap="onDissolveTeam">确认解散</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 弹窗：退出团队 -->
+  <view class="modal-mask" wx:if="{{showLeaveModal}}" bindtap="onCloseLeaveModal">
+    <view class="modal-content" catchtap>
+      <text class="modal-title">退出团队</text>
+      <text class="modal-desc">退出后您将无法代表团队预约场馆，确认退出？</text>
+
+      <view class="modal-actions">
+        <view class="btn-cancel" bindtap="onCloseLeaveModal">取消</view>
+        <view class="btn-danger" bindtap="onLeaveTeam">确认退出</view>
+      </view>
+    </view>
+  </view>
+</view>

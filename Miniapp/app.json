@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/venue-detail/venue-detail",
+    "pages/team/team",
+    "pages/bookings/bookings",
+    "pages/profile/profile",
+    "pages/culture-center/culture-center"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#3d8e7a",
+    "navigationBarTitleText": "斗门文化中心",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#faf8f6"
+  },
+  "tabBar": {
+    "color": "#a89885",
+    "selectedColor": "#3d8e7a",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/team/team",
+        "text": "团队",
+        "iconPath": "images/tab-team.png",
+        "selectedIconPath": "images/tab-team-active.png"
+      },
+      {
+        "pagePath": "pages/bookings/bookings",
+        "text": "预约",
+        "iconPath": "images/tab-bookings.png",
+        "selectedIconPath": "images/tab-bookings-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

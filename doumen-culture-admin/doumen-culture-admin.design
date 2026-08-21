@@ -1,0 +1,171 @@
+{
+  "data": [
+    {
+      "id": "page-login",
+      "title": "管理员登录",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-be56bb7b",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/login.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-dashboard",
+      "title": "工作台",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1030,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e4837ea1",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-venue-manage",
+      "title": "场地管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-9314845b",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/venue-manage.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-booking-manage",
+      "title": "预约管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 949,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-ceb38aee",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/booking-manage.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-time-slots",
+      "title": "时间段设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 2480,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1699,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d5f5270b",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/time-slots.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-notifications",
+      "title": "通知管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 3100,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1209,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-87ac108a",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/notifications.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-admin-users",
+      "title": "管理员管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 3720,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-dec988bc",
+          "measuredAt": 1786441426777
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-users.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "斗门文化中心 — 后台管理",
+    "designLibrary": null
+  }
+}

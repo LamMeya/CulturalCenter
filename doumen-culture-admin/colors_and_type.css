@@ -1,0 +1,119 @@
+/* ============================================
+   斗门文化中心 — 渔乡文艺风 品牌配色系统
+   Doumen Cultural Center — Fishing Village Artistic Style
+   ============================================ */
+
+/* --- Brand Prefix: dm --- */
+
+/* === Primary: 青绿 (Coastal Blue-Green) === */
+:root {
+  --dm-primary-50: #f0f7f5;
+  --dm-primary-100: #dceee8;
+  --dm-primary-200: #b9ddd1;
+  --dm-primary-300: #8cc7b5;
+  --dm-primary-400: #5eaa94;
+  --dm-primary-500: #3d8e7a;
+  --dm-primary-600: #2e7262;
+  --dm-primary-700: #275b50;
+  --dm-primary-800: #224a41;
+  --dm-primary-900: #1d3e37;
+  --dm-primary-950: #0c221e;
+
+  /* === Neutral: 蚝壳暖白 (Oyster Shell Warm White) === */
+  --dm-neutral-50: #faf8f6;
+  --dm-neutral-100: #f5f0eb;
+  --dm-neutral-200: #ebe3da;
+  --dm-neutral-300: #d9cec1;
+  --dm-neutral-400: #bfb0a0;
+  --dm-neutral-500: #a89885;
+  --dm-neutral-600: #8c7b6a;
+  --dm-neutral-700: #6b5d50;
+  --dm-neutral-800: #544a40;
+  --dm-neutral-900: #3d3630;
+  --dm-neutral-950: #211c18;
+
+  /* === State Colors === */
+  --state-success: #4caf7d;
+  --state-success-light: #e8f5ee;
+  --state-warning: #e8a840;
+  --state-warning-light: #fdf6e8;
+  --state-error: #d4644a;
+  --state-error-light: #fdf0ed;
+  --state-info: #5b9ecf;
+  --state-info-light: #eef5fb;
+
+  /* === Semantic Aliases === */
+  --dm-background: #faf8f6;
+  --dm-foreground: #211c18;
+  --dm-card: #ffffff;
+  --dm-card-foreground: #211c18;
+  --dm-popover: #ffffff;
+  --dm-popover-foreground: #211c18;
+  --dm-primary: #3d8e7a;
+  --dm-primary-foreground: #ffffff;
+  --dm-muted: #f5f0eb;
+  --dm-muted-foreground: #8c7b6a;
+  --dm-border: #ebe3da;
+  --dm-input: #ebe3da;
+  --dm-ring: rgba(61, 142, 122, 0.3);
+
+  /* === Radius Scale === */
+  --dm-radius-sm: 4px;
+  --dm-radius-medium: 8px;
+  --dm-radius-lg: 12px;
+  --dm-radius-full: 9999px;
+}
+
+/* === Dark Mode (Mobile — for evening/notification use) === */
+.dark {
+  --dm-background: #1a1612;
+  --dm-foreground: #f5f0eb;
+  --dm-card: #24201a;
+  --dm-card-foreground: #f5f0eb;
+  --dm-popover: #2c2820;
+  --dm-popover-foreground: #f5f0eb;
+  --dm-primary: #5eaa94;
+  --dm-primary-foreground: #0c221e;
+  --dm-muted: #2c2820;
+  --dm-muted-foreground: #a89885;
+  --dm-border: #3d3630;
+  --dm-input: #3d3630;
+  --dm-ring: rgba(94, 170, 148, 0.4);
+}
+
+/* === Typography === */
+:root {
+  --font-heading: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--dm-foreground);
+  background: var(--dm-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+/* === Accent: 渔灯暖橙 (Fishing Lantern Warm Glow) — used sparingly as visual accent === */
+.accent-glow {
+  color: #e8a840;
+}
+
+.accent-glow-bg {
+  background: linear-gradient(135deg, #e8a840, #f0c060);
+}

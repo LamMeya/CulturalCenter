@@ -1,0 +1,217 @@
+/* pages/profile/profile.wxss — 我的个人中心 */
+
+.page-container {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+}
+
+/* ========== 未登录 ========== */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 180rpx;
+}
+
+.login-avatar-placeholder {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: var(--dm-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.placeholder-icon {
+  font-size: 60rpx;
+}
+
+.login-text {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  margin-bottom: 12rpx;
+}
+
+.login-desc {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  margin-bottom: 48rpx;
+}
+
+.btn-login {
+  width: 400rpx;
+  padding: 24rpx;
+  border-radius: var(--dm-radius-sm);
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+/* ========== 用户信息卡片 ========== */
+.user-card {
+  margin-top: 32rpx;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--dm-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+}
+
+.user-detail {
+  flex: 1;
+}
+
+.user-nickname {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.user-phone {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+.bind-phone-btn {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border: 2rpx solid var(--dm-primary);
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: var(--dm-primary);
+}
+
+/* ========== 团队信息卡片 ========== */
+.team-card {
+  margin-top: 16rpx;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.team-label {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+.team-role-badge {
+  padding: 4rpx 16rpx;
+  background: #e8f5ee;
+  color: var(--dm-primary);
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.team-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+}
+
+/* ========== 快捷操作 ========== */
+.actions-section {
+  margin-top: 32rpx;
+}
+
+.actions-section .section-title {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  margin: 0 24rpx 16rpx;
+}
+
+.action-list {
+  background: var(--dm-card);
+  margin: 0 24rpx;
+  border-radius: var(--dm-radius);
+  overflow: hidden;
+}
+
+.action-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx 24rpx;
+  border-bottom: 1rpx solid var(--dm-border);
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+.action-left {
+  display: flex;
+  align-items: center;
+}
+
+.action-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+}
+
+.action-text {
+  font-size: 28rpx;
+  color: var(--dm-text);
+}
+
+.action-arrow {
+  font-size: 36rpx;
+  color: var(--dm-border);
+  font-weight: 300;
+}
+
+.action-item:active {
+  background: #faf8f6;
+}
+
+/* ========== 退出登录 ========== */
+.logout-section {
+  padding: 64rpx 24rpx 40rpx;
+}
+
+.btn-logout {
+  text-align: center;
+  padding: 24rpx;
+  border-radius: var(--dm-radius-sm);
+  border: 2rpx solid var(--dm-border);
+  font-size: 28rpx;
+  color: var(--dm-muted);
+}
+
+.btn-logout:active {
+  background: #faf8f6;
+}

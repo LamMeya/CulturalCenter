@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>预约记录 — 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       斗门渔乡文艺风 — 预约记录页 Brand CSS
+       ============================================ */
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+      --state-success: #4caf7d;
+      --state-warning: #e8a840;
+      --state-error: #d4644a;
+      --font-heading: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', serif;
+      --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--dm-foreground);
+      background: var(--dm-background);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+
+    /* --- 页面容器 --- */
+    .app-shell {
+      max-width: 28rem;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+      background: var(--dm-background);
+    }
+
+    /* --- 预约卡片 --- */
+    .booking-card {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg);
+      border: 1px solid var(--dm-border);
+      padding: 16px;
+      transition: box-shadow 0.2s ease;
+    }
+    .booking-card:active {
+      box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    }
+
+    /* --- 状态徽章 --- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .status-badge--pending {
+      background: #fdf6e8;
+      color: #b88620;
+      border: 1px solid rgba(232, 168, 64, 0.3);
+    }
+    .status-badge--won {
+      background: #e8f5ee;
+      color: #2d7a4a;
+      border: 1px solid rgba(76, 175, 125, 0.3);
+    }
+    .status-badge--lost {
+      background: #f5f0eb;
+      color: #8c7b6a;
+      border: 1px solid rgba(140, 123, 106, 0.2);
+    }
+    .status-badge--cancelled {
+      background: #fdf0ed;
+      color: #b84a35;
+      border: 1px solid rgba(212, 100, 74, 0.3);
+    }
+
+    /* --- 取消按钮 --- */
+    .cancel-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: var(--dm-radius-medium);
+      border: 1px solid var(--dm-border);
+      background: var(--dm-card);
+      color: var(--dm-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-body);
+    }
+    .cancel-btn:active {
+      background: var(--dm-muted);
+    }
+    .cancel-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* --- 频次提醒卡片 --- */
+    .usage-card {
+      background: var(--dm-muted);
+      border-radius: var(--dm-radius-medium);
+      border: 1px solid var(--dm-border);
+      padding: 14px 16px;
+    }
+
+    /* --- 空状态 --- */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    /* --- 底部导航 --- */
+    .bottom-nav-item {
+      color: #a89885;
+      transition: color 0.15s ease;
+    }
+    .bottom-nav-item[data-active="true"] {
+      color: #3d8e7a;
+    }
+
+    /* --- 模态弹窗 --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(33, 28, 24, 0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay.hidden {
+      display: none;
+    }
+    .modal-sheet {
+      background: var(--dm-card);
+      border-radius: var(--dm-radius-lg) var(--dm-radius-lg) 0 0;
+      padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      width: 100%;
+      max-width: 28rem;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ===== 页面标题 ===== -->
+    <header class="sticky top-0 z-40 bg-[var(--dm-background)]/95 backdrop-blur-sm border-b border-[var(--dm-border)]">
+      <div class="px-4 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-[var(--dm-foreground)] m-0" style="font-family: var(--font-heading);">预约记录</h1>
+        <span class="text-xs text-[#a89885]">斗门文化中心</span>
+      </div>
+    </header>
+
+    <!-- ===== 频次提醒卡片 ===== -->
+    <div class="px-4 pt-4 pb-2">
+      <div class="usage-card" data-dom-id="usage-reminder">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 shrink-0 mt-0.5" style="color: var(--state-warning);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+          </svg>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-[var(--dm-foreground)] m-0 mb-2">预约频次说明</p>
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-[#8c7b6a]">30天内取消次数</span>
+                <span class="text-xs font-semibold" style="color: var(--state-error);" data-dom-id="cancel-count">已取消 <span id="cancelCount">1</span> 次 / 最多 2 次</span>
+              </div>
+              <div class="w-full h-1.5 bg-white rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300" style="width: 50%; background: var(--state-error);" id="cancelBar"></div>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-xs text-[#8c7b6a]">2周内成功预约</span>
+                <span class="text-xs font-semibold" style="color: var(--state-success);" data-dom-id="success-count">已预约 <span id="successCount">1</span> / 2 次</span>
+              </div>
+              <div class="w-full h-1.5 bg-white rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300" style="width: 50%; background: var(--state-success);" id="successBar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 预约列表 ===== -->
+    <div class="px-4 pt-3 pb-2" id="bookingsContainer">
+      <div class="flex flex-col gap-3" id="bookingList">
+
+        <!-- 预约卡片 1：待抽签 -->
+        <div class="booking-card" data-dom-id="booking-card" data-booking-id="BK20260801001" data-status="pending">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold text-[var(--dm-foreground)] m-0 truncate" style="font-family: var(--font-heading);">多功能排练厅 A</h3>
+              <p class="text-xs text-[#8c7b6a] mt-1">斗门文化中心 · 2楼</p>
+            </div>
+            <span class="status-badge status-badge--pending ml-3 shrink-0" data-dom-id="status-badge" data-status="pending">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/></svg>
+              待抽签
+            </span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-[#6b5d50] mb-3">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>2026年8月15日（周六）</span>
+            <span class="text-[#d9cec1]">|</span>
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>14:00 - 17:00</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[var(--dm-border)]">
+            <span class="text-xs text-[#a89885]">预约编号：BK20260801001</span>
+            <button class="cancel-btn" data-dom-id="cancel-btn" data-booking-id="BK20260801001" data-status="pending" onclick="handleCancel('BK20260801001', 'pending')">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              取消预约
+            </button>
+          </div>
+        </div>
+
+        <!-- 预约卡片 2：已中签 -->
+        <div class="booking-card" data-dom-id="booking-card" data-booking-id="BK20260728002" data-status="won">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold text-[var(--dm-foreground)] m-0 truncate" style="font-family: var(--font-heading);">多功能排练厅 A</h3>
+              <p class="text-xs text-[#8c7b6a] mt-1">斗门文化中心 · 2楼</p>
+            </div>
+            <span class="status-badge status-badge--won ml-3 shrink-0" data-dom-id="status-badge" data-status="won">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              已中签
+            </span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-[#6b5d50] mb-3">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>2026年8月8日（周六）</span>
+            <span class="text-[#d9cec1]">|</span>
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>09:00 - 12:00</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[var(--dm-border)]">
+            <span class="text-xs text-[#a89885]">预约编号：BK20260728002</span>
+            <button class="cancel-btn" data-dom-id="cancel-btn" data-booking-id="BK20260728002" data-status="won" disabled>
+              已中签，不可取消
+            </button>
+          </div>
+        </div>
+
+        <!-- 预约卡片 3：未中签 -->
+        <div class="booking-card" data-dom-id="booking-card" data-booking-id="BK20260725003" data-status="lost">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold text-[var(--dm-foreground)] m-0 truncate" style="font-family: var(--font-heading);">舞蹈排练室 B</h3>
+              <p class="text-xs text-[#8c7b6a] mt-1">斗门文化中心 · 1楼</p>
+            </div>
+            <span class="status-badge status-badge--lost ml-3 shrink-0" data-dom-id="status-badge" data-status="lost">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              未中签
+            </span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-[#6b5d50] mb-3">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>2026年8月1日（周六）</span>
+            <span class="text-[#d9cec1]">|</span>
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>14:00 - 17:00</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[var(--dm-border)]">
+            <span class="text-xs text-[#a89885]">预约编号：BK20260725003</span>
+            <span class="text-xs text-[#bfb0a0]">抽签已结束</span>
+          </div>
+        </div>
+
+        <!-- 预约卡片 4：已取消 -->
+        <div class="booking-card" data-dom-id="booking-card" data-booking-id="BK20260720004" data-status="cancelled">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold text-[var(--dm-foreground)] m-0 truncate" style="font-family: var(--font-heading);">多功能排练厅 A</h3>
+              <p class="text-xs text-[#8c7b6a] mt-1">斗门文化中心 · 2楼</p>
+            </div>
+            <span class="status-badge status-badge--cancelled ml-3 shrink-0" data-dom-id="status-badge" data-status="cancelled">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              已取消
+            </span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-[#6b5d50] mb-3">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>2026年7月26日（周日）</span>
+            <span class="text-[#d9cec1]">|</span>
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>09:00 - 12:00</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[var(--dm-border)]">
+            <span class="text-xs text-[#a89885]">预约编号：BK20260720004</span>
+            <span class="text-xs text-[#bfb0a0]">已于 7月24日 取消</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== 空状态（默认隐藏） ===== -->
+    <div class="empty-state hidden" id="emptyState" data-dom-id="empty-state">
+      <div class="w-20 h-20 rounded-full flex items-center justify-center mb-4" style="background: var(--dm-muted);">
+        <svg class="w-10 h-10" style="color: #bfb0a0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6"/>
+        </svg>
+      </div>
+      <p class="text-base font-semibold text-[#6b5d50] m-0 mb-1" style="font-family: var(--font-heading);">暂无预约记录</p>
+      <p class="text-sm text-[#a89885] m-0 max-w-xs">您的团队还没有预约过场地，前往首页浏览可预约的场地吧</p>
+      <a href="index.html" class="inline-flex items-center gap-2 mt-6 px-6 py-2.5 rounded-lg text-sm font-medium text-white no-underline" style="background: var(--dm-primary);">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        前往首页
+      </a>
+    </div>
+
+    <!-- ===== 取消确认弹窗 ===== -->
+    <div class="modal-overlay hidden" id="cancelModal" data-dom-id="cancel-modal">
+      <div class="modal-sheet">
+        <h3 class="text-lg font-semibold text-[var(--dm-foreground)] m-0 mb-3" style="font-family: var(--font-heading);">确认取消预约</h3>
+
+        <!-- 正常取消提示 -->
+        <div id="cancelNormalHint">
+          <p class="text-sm text-[#6b5d50] m-0 mb-4">取消后该场地将释放给其他团队预约，确定要取消吗？</p>
+        </div>
+
+        <!-- 频次限制警告（抽签后取消） -->
+        <div id="cancelLimitWarning" class="hidden">
+          <div class="rounded-lg p-3 mb-4" style="background: #fdf0ed; border: 1px solid rgba(212, 100, 74, 0.2);">
+            <div class="flex items-start gap-2">
+              <svg class="w-4 h-4 shrink-0 mt-0.5" style="color: var(--state-error);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z"/>
+              </svg>
+              <div>
+                <p class="text-sm font-medium m-0" style="color: var(--state-error);">频次限制提醒</p>
+                <p class="text-xs text-[#6b5d50] mt-1 m-0">当前已抽签，取消后将计入30天取消次数限制。您30天内已取消 <strong id="modalCancelCount">1</strong> 次，最多允许2次，请谨慎操作。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-4">
+          <button class="flex-1 py-2.5 rounded-lg border border-[var(--dm-border)] bg-white text-[var(--dm-foreground)] text-sm font-medium cursor-pointer" onclick="closeCancelModal()" style="font-family: var(--font-body);">
+            再想想
+          </button>
+          <button class="flex-1 py-2.5 rounded-lg border-none text-white text-sm font-medium cursor-pointer" style="background: var(--state-error); font-family: var(--font-body);" onclick="confirmCancel()" data-dom-id="confirm-cancel-btn">
+            确认取消
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 底部导航 ===== -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[var(--dm-border)] h-[56px]" style="padding-bottom: env(safe-area-inset-bottom, 0px);" data-mobile-nav="global">
+      <div class="w-full max-w-md mx-auto grid grid-cols-4 h-full">
+        <!-- 首页 -->
+        <a href="index.html" class="bottom-nav-item min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline" data-nav-key="home">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">首页</span>
+        </a>
+        <!-- 团队 -->
+        <a href="team.html" class="bottom-nav-item min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline" data-nav-key="team">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">团队</span>
+        </a>
+        <!-- 预约（活跃） -->
+        <a href="bookings.html" class="bottom-nav-item min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline" data-nav-key="bookings" data-active="true" style="color: #3d8e7a;">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">预约</span>
+        </a>
+        <!-- 我的 -->
+        <a href="profile.html" class="bottom-nav-item min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full no-underline" data-nav-key="profile">
+          <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">我的</span>
+        </a>
+      </div>
+    </nav>
+
+  </div>
+
+  <script>
+    // ===== 取消预约业务逻辑 =====
+    let currentCancelBookingId = null;
+    let currentCancelStatus = null;
+
+    function handleCancel(bookingId, status) {
+      currentCancelBookingId = bookingId;
+      currentCancelStatus = status;
+
+      const modal = document.getElementById('cancelModal');
+      const normalHint = document.getElementById('cancelNormalHint');
+      const limitWarning = document.getElementById('cancelLimitWarning');
+      const modalCancelCount = document.getElementById('modalCancelCount');
+
+      if (status === 'pending') {
+        // 抽签前取消：正常提示
+        normalHint.classList.remove('hidden');
+        limitWarning.classList.add('hidden');
+      } else {
+        // 抽签后取消：频次限制提示
+        normalHint.classList.add('hidden');
+        limitWarning.classList.remove('hidden');
+        modalCancelCount.textContent = document.getElementById('cancelCount').textContent;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.add('hidden');
+      currentCancelBookingId = null;
+      currentCancelStatus = null;
+    }
+
+    function confirmCancel() {
+      if (!currentCancelBookingId) return;
+
+      const card = document.querySelector(`[data-booking-id="${currentCancelBookingId}"]`);
+      const badge = card.querySelector('[data-dom-id="status-badge"]');
+      const cancelBtn = card.querySelector('[data-dom-id="cancel-btn"]');
+
+      // 更新状态徽章
+      badge.className = 'status-badge status-badge--cancelled ml-3 shrink-0';
+      badge.setAttribute('data-status', 'cancelled');
+      badge.innerHTML = `
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        已取消
+      `;
+
+      card.setAttribute('data-status', 'cancelled');
+
+      // 替换取消按钮
+      if (cancelBtn) {
+        const now = new Date();
+        const cancelDate = `${now.getMonth() + 1}月${now.getDate()}日`;
+        const footer = cancelBtn.parentElement;
+        cancelBtn.remove();
+        const cancelledLabel = document.createElement('span');
+        cancelledLabel.className = 'text-xs text-[#bfb0a0]';
+        cancelledLabel.textContent = `已于 ${cancelDate} 取消`;
+        footer.appendChild(cancelledLabel);
+      }
+
+      // 更新取消计数
+      const cancelCountEl = document.getElementById('cancelCount');
+      const cancelBar = document.getElementById('cancelBar');
+      const currentCount = parseInt(cancelCountEl.textContent) + 1;
+      cancelCountEl.textContent = currentCount;
+      cancelBar.style.width = (currentCount / 2 * 100) + '%';
+
+      if (currentCount >= 2) {
+        cancelBar.style.background = 'var(--state-error)';
+      }
+
+      closeCancelModal();
+    }
+
+    // ===== 点击弹窗遮罩关闭 =====
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeCancelModal();
+      }
+    });
+  </script>
+</body>
+</html>

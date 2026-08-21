@@ -1,0 +1,742 @@
+/* pages/venue-detail/venue-detail.wxss — 场馆详情与预约 */
+
+/* ========== 加载状态 ========== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid var(--dm-border);
+  border-top-color: var(--dm-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner.small {
+  width: 36rpx;
+  height: 36rpx;
+  border-width: 3rpx;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+/* ========== 场馆 Hero 区 ========== */
+.venue-hero {
+  position: relative;
+  height: 420rpx;
+  overflow: hidden;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #2e6e5e, #3d8e7a, #5baa96);
+  position: relative;
+}
+
+.hero-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80rpx;
+}
+
+.hw-1 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50% 50% 0 0;
+  animation: wf1 6s ease-in-out infinite;
+}
+
+.hw-2 {
+  position: absolute;
+  bottom: 20rpx;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: rgba(255,255,255,0.05);
+  border-radius: 45% 55% 0 0;
+  animation: wf2 8s ease-in-out infinite;
+}
+
+@keyframes wf1 {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-40rpx); }
+}
+
+@keyframes wf2 {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(40rpx); }
+}
+
+.hero-icon {
+  font-size: 100rpx;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 60rpx 32rpx 32rpx;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55));
+}
+
+.hero-tag {
+  display: inline-block;
+  background: rgba(232, 168, 64, 0.9);
+  color: #fff;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.hero-name {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.hero-desc {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 8rpx;
+  line-height: 1.5;
+}
+
+/* ========== 信息卡片 ========== */
+.info-card {
+  background: var(--dm-card);
+  margin: 24rpx;
+  border-radius: var(--dm-radius);
+  padding: 28rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.05);
+}
+
+.info-grid {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid var(--dm-border);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 22rpx;
+  color: var(--dm-muted);
+  margin-bottom: 8rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+  display: flex;
+  align-items: center;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 8rpx;
+}
+
+.dot-open {
+  background: #4caf7d;
+}
+
+.dot-closed {
+  background: #8c7b6a;
+}
+
+/* 设施 */
+.info-facilities {
+  padding-top: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid var(--dm-border);
+}
+
+.facility-label {
+  font-size: 22rpx;
+  color: var(--dm-muted);
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.facility-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.f-tag {
+  font-size: 22rpx;
+  color: var(--dm-primary);
+  background: rgba(61, 142, 122, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: 16rpx;
+}
+
+/* 地址 */
+.info-address {
+  padding-top: 24rpx;
+  display: flex;
+  align-items: flex-start;
+}
+
+.address-icon {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+
+.address-text {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  line-height: 1.5;
+}
+
+/* ========== 预约区域 ========== */
+.booking-section {
+  margin: 0 24rpx 24rpx;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.step-badge {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: var(--dm-primary);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+  flex: 1;
+}
+
+.step-hint {
+  font-size: 24rpx;
+  color: var(--dm-accent);
+  font-weight: 500;
+}
+
+/* ========== 日期条 ========== */
+.date-strip {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.date-strip-inner {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 4rpx 0;
+}
+
+.date-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120rpx;
+  height: 130rpx;
+  background: var(--dm-card);
+  border-radius: var(--dm-radius-sm);
+  border: 2rpx solid var(--dm-border);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.date-item.date-active {
+  background: var(--dm-primary);
+  border-color: var(--dm-primary);
+}
+
+.date-item.date-active .date-dayname,
+.date-item.date-active .date-day,
+.date-item.date-active .date-month {
+  color: #ffffff;
+}
+
+.date-item.date-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.date-dayname {
+  font-size: 22rpx;
+  color: var(--dm-muted);
+  margin-bottom: 4rpx;
+}
+
+.date-day {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  line-height: 1.2;
+}
+
+.date-month {
+  font-size: 20rpx;
+  color: var(--dm-muted);
+  margin-top: 2rpx;
+}
+
+.date-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--dm-accent);
+  margin-top: 6rpx;
+}
+
+.date-active .date-dot {
+  background: rgba(255,255,255,0.6);
+}
+
+/* ========== 时段加载/空状态 ========== */
+.slot-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  gap: 12rpx;
+}
+
+.slot-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  background: var(--dm-card);
+  border-radius: var(--dm-radius);
+}
+
+.empty-icon {
+  font-size: 60rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--dm-muted);
+  margin-bottom: 8rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #c0b5a5;
+}
+
+/* ========== 时段分组 ========== */
+.slot-group {
+  margin-bottom: 20rpx;
+}
+
+.slot-group-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding: 0 4rpx;
+}
+
+.group-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.group-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+
+.slot-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--dm-card);
+  border: 2rpx solid var(--dm-border);
+  border-radius: var(--dm-radius-sm);
+  padding: 20rpx 12rpx;
+  min-height: 100rpx;
+  transition: all 0.2s;
+}
+
+.slot-item:active {
+  transform: scale(0.96);
+}
+
+.slot-item.slot-selected {
+  background: rgba(61, 142, 122, 0.08);
+  border-color: var(--dm-primary);
+}
+
+.slot-time {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+}
+
+.slot-item.slot-selected .slot-time {
+  color: var(--dm-primary);
+}
+
+.slot-duration {
+  font-size: 20rpx;
+  color: var(--dm-muted);
+  margin-top: 4rpx;
+}
+
+.slot-check {
+  position: absolute;
+  top: 6rpx;
+  right: 8rpx;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: var(--dm-primary);
+  color: #fff;
+  font-size: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== 底部固定栏 ========== */
+.bottom-spacer {
+  height: 140rpx;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--dm-card);
+  padding: 20rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2rpx 16rpx rgba(0,0,0,0.06);
+  z-index: 100;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.bottom-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.bottom-count {
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+.count-num {
+  color: var(--dm-primary);
+  font-weight: 700;
+  font-size: 30rpx;
+}
+
+.selected-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 6rpx;
+}
+
+.summary-item {
+  font-size: 20rpx;
+  color: var(--dm-primary);
+  background: rgba(61, 142, 122, 0.08);
+  padding: 2rpx 10rpx;
+  border-radius: 10rpx;
+}
+
+.btn-confirm {
+  padding: 20rpx 40rpx;
+  background: var(--dm-primary);
+  color: #fff;
+  border-radius: var(--dm-radius-sm);
+  font-size: 30rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 20rpx;
+}
+
+.btn-confirm:active {
+  background: var(--dm-primary-dark);
+}
+
+.btn-disabled {
+  background: #b0cbc4;
+  pointer-events: none;
+}
+
+/* ========== 弹窗 ========== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  width: 600rpx;
+  background: var(--dm-card);
+  border-radius: var(--dm-radius);
+  padding: 40rpx 32rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40rpx); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-info {
+  margin-bottom: 32rpx;
+}
+
+.modal-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--dm-border);
+}
+
+.modal-row:last-child {
+  border-bottom: none;
+}
+
+.modal-label {
+  width: 100rpx;
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  flex-shrink: 0;
+}
+
+.modal-value {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--dm-text);
+  font-weight: 500;
+}
+
+.modal-slot {
+  display: block;
+  font-size: 24rpx;
+  color: var(--dm-primary);
+  margin-bottom: 4rpx;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 20rpx;
+  text-align: center;
+  border: 2rpx solid var(--dm-border);
+  border-radius: var(--dm-radius-sm);
+  font-size: 28rpx;
+  color: var(--dm-muted);
+}
+
+.btn-submit {
+  flex: 1;
+  padding: 20rpx;
+  text-align: center;
+  background: var(--dm-primary);
+  border-radius: var(--dm-radius-sm);
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-submit:active {
+  background: var(--dm-primary-dark);
+}
+
+.btn-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ========== 成功弹窗 ========== */
+.success-modal {
+  text-align: center;
+}
+
+.success-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: var(--dm-primary);
+  color: #fff;
+  font-size: 44rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20rpx;
+}
+
+.success-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  margin-bottom: 8rpx;
+}
+
+.success-desc {
+  display: block;
+  font-size: 26rpx;
+  color: var(--dm-muted);
+  margin-bottom: 24rpx;
+}
+
+.success-info {
+  background: rgba(61, 142, 122, 0.06);
+  border-radius: var(--dm-radius-sm);
+  padding: 20rpx;
+  margin-bottom: 28rpx;
+  text-align: left;
+}
+
+.si-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+
+.si-label {
+  font-size: 24rpx;
+  color: var(--dm-muted);
+}
+
+.si-value {
+  font-size: 24rpx;
+  color: var(--dm-text);
+  font-weight: 500;
+}
+
+.status-pending {
+  color: var(--dm-accent);
+}
+
+.success-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-back {
+  flex: 1;
+  padding: 20rpx;
+  text-align: center;
+  border: 2rpx solid var(--dm-border);
+  border-radius: var(--dm-radius-sm);
+  font-size: 28rpx;
+  color: var(--dm-muted);
+}
+
+.btn-view-bookings {
+  flex: 1;
+  padding: 20rpx;
+  text-align: center;
+  background: var(--dm-primary);
+  border-radius: var(--dm-radius-sm);
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 600;
+}

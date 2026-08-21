@@ -1,0 +1,421 @@
+/* pages/index/index.wxss — 首页 渔乡文艺风 */
+
+/* ========== 顶部品牌区 ========== */
+.brand-hero {
+  position: relative;
+  height: 320rpx;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2e6e5e 0%, #3d8e7a 40%, #5baa96 70%, #7cc4b2 100%);
+}
+
+.brand-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+}
+
+.wave-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+}
+
+.wave-1 {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 60rpx,
+    rgba(255,255,255,0.15) 60rpx,
+    rgba(255,255,255,0.15) 62rpx
+  );
+  border-radius: 50% 50% 0 0;
+  animation: waveFloat 8s ease-in-out infinite;
+}
+
+.wave-2 {
+  bottom: 20rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 80rpx,
+    rgba(255,255,255,0.10) 80rpx,
+    rgba(255,255,255,0.10) 82rpx
+  );
+  border-radius: 45% 55% 0 0;
+  animation: waveFloat 10s ease-in-out infinite reverse;
+}
+
+.wave-3 {
+  bottom: 40rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 100rpx,
+    rgba(255,255,255,0.05) 100rpx,
+    rgba(255,255,255,0.05) 102rpx
+  );
+  border-radius: 40% 60% 0 0;
+  animation: waveFloat 12s ease-in-out infinite;
+}
+
+@keyframes waveFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-60rpx); }
+}
+
+.brand-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.brand-name {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 6rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.15);
+}
+
+.brand-subtitle {
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 8rpx;
+  letter-spacing: 4rpx;
+}
+
+/* ========== 通知横幅 ========== */
+.notification-bar {
+  display: flex;
+  align-items: center;
+  margin: 16rpx 24rpx;
+  padding: 16rpx 20rpx;
+  background: linear-gradient(135deg, #fdf6e8, #fef0d0);
+  border-left: 6rpx solid var(--dm-accent);
+  border-radius: var(--dm-radius-sm);
+  height: 56rpx;
+}
+
+.notification-icon {
+  margin-right: 12rpx;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.notification-swiper {
+  flex: 1;
+  height: 40rpx;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  height: 40rpx;
+}
+
+.notification-text {
+  font-size: 26rpx;
+  color: #8a6d20;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-arrow {
+  font-size: 28rpx;
+  color: #c8a54a;
+  margin-left: 8rpx;
+  flex-shrink: 0;
+}
+
+/* ========== 加载状态 ========== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid var(--dm-border);
+  border-top-color: var(--dm-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--dm-muted);
+}
+
+/* ========== 错误状态 ========== */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.error-text {
+  font-size: 28rpx;
+  color: var(--dm-muted);
+  margin-bottom: 24rpx;
+}
+
+.btn-retry {
+  padding: 16rpx 48rpx;
+  background: var(--dm-primary);
+  color: #fff;
+  border-radius: var(--dm-radius-sm);
+  font-size: 28rpx;
+}
+
+/* ========== 分区标题 ========== */
+.section {
+  padding-bottom: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 24rpx 24rpx 16rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--dm-text);
+  position: relative;
+  padding-left: 20rpx;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 28rpx;
+  background: var(--dm-primary);
+  border-radius: 3rpx;
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: var(--dm-muted);
+}
+
+/* ========== 场馆卡片 — 两列网格 ========== */
+.venue-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 24rpx;
+  gap: 16rpx;
+}
+
+.venue-card {
+  width: calc(50% - 8rpx);
+  background: var(--dm-card);
+  border-radius: var(--dm-radius);
+  overflow: hidden;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.venue-card:active {
+  transform: scale(0.98);
+}
+
+/* 图片区域 */
+.venue-image {
+  position: relative;
+  width: 100%;
+  height: 200rpx;
+  overflow: hidden;
+}
+
+.venue-img {
+  width: 100%;
+  height: 100%;
+}
+
+.venue-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4e8e2, #b8d9ce, #c5e0d6);
+  position: relative;
+  overflow: hidden;
+}
+
+.venue-img-placeholder::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60rpx;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 50% 50% 0 0;
+}
+
+.placeholder-icon {
+  font-size: 60rpx;
+  opacity: 0.7;
+}
+
+.venue-image-tag {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  background: rgba(61, 142, 122, 0.85);
+  color: #fff;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+/* 信息区域 — 无水平内边距，与图片左右对齐 */
+.venue-info {
+  padding: 16rpx 0;
+}
+
+.venue-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+  padding: 0;
+}
+
+.venue-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dm-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-status {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 20rpx;
+  margin-left: 8rpx;
+  flex-shrink: 0;
+}
+
+.status-open {
+  background: #e8f5ee;
+  color: #4caf7d;
+}
+
+.status-closed {
+  background: #f5f0eb;
+  color: #8c7b6a;
+}
+
+.venue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+  padding: 0;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  font-size: 22rpx;
+  color: var(--dm-muted);
+}
+
+.meta-icon {
+  margin-right: 4rpx;
+  font-size: 20rpx;
+}
+
+.meta-text {
+  line-height: 1;
+}
+
+.meta-address {
+  max-width: 140rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0 0;
+  border-top: 1rpx solid var(--dm-border);
+}
+
+.facility-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.facility-tag {
+  font-size: 18rpx;
+  color: var(--dm-primary);
+  background: rgba(61, 142, 122, 0.08);
+  padding: 4rpx 10rpx;
+  border-radius: 16rpx;
+}
+
+.venue-arrow {
+  font-size: 24rpx;
+  color: var(--dm-muted);
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  opacity: 0.4;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--dm-muted);
+  margin-bottom: 8rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #c0b5a5;
+}

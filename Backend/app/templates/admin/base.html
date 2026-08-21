@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>斗门文化中心 - 后台管理</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --dm-primary: #3d8e7a;
+      --dm-primary-dark: #2e6e5e;
+      --dm-bg: #faf8f6;
+      --dm-card: #ffffff;
+      --dm-border: #ebe3da;
+      --dm-text: #211c18;
+      --dm-muted: #8c7b6a;
+      --dm-accent: #e8a840;
+    }
+    body { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; background: var(--dm-bg); color: var(--dm-text); }
+    .sidebar { background: var(--dm-card); border-right: 1px solid var(--dm-border); min-height: 100vh; }
+    .sidebar .nav-link { color: var(--dm-text); border-radius: 8px; padding: 10px 16px; margin: 2px 0; transition: all 0.2s; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #ecf5f2; color: var(--dm-primary); }
+    .sidebar .nav-link.active { font-weight: 600; border-left: 3px solid var(--dm-primary); }
+    .sidebar .nav-link i { width: 20px; }
+    .card { border: 1px solid var(--dm-border); border-radius: 12px; background: var(--dm-card); }
+    .btn-primary { background: var(--dm-primary); border-color: var(--dm-primary); }
+    .btn-primary:hover { background: var(--dm-primary-dark); border-color: var(--dm-primary-dark); }
+    .btn-outline-primary { color: var(--dm-primary); border-color: var(--dm-primary); }
+    .btn-outline-primary:hover { background: var(--dm-primary); color: #fff; }
+    .table { --bs-table-bg: var(--dm-card); }
+    .badge-pending { background: #fdf6e8; color: #e8a840; }
+    .badge-won { background: #e8f5ee; color: #4caf7d; }
+    .badge-lost { background: #f5f0eb; color: #8c7b6a; }
+    .badge-cancelled { background: #fdf0ed; color: #d4644a; }
+    .topbar { background: var(--dm-card); border-bottom: 1px solid var(--dm-border); }
+    /* mobile */
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; z-index: 1040; left: -280px; width: 280px; transition: left 0.3s; }
+      .sidebar.show { left: 0; }
+      .sidebar-backdrop { display: none; }
+      .sidebar-backdrop.show { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1035; }
+    }
+  </style>
+</head>
+<body>
+  <div class="d-flex">
+    <!-- Sidebar Backdrop (mobile) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column flex-shrink-0 p-3" id="sidebar" style="width: 240px;">
+      <div class="d-flex align-items-center mb-3 px-2">
+        <i class="bi bi-building fs-4 me-2" style="color: var(--dm-primary);"></i>
+        <span class="fs-5 fw-bold" style="color: var(--dm-primary);">斗门文化中心</span>
+      </div>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li><a href="/admin/dashboard" class="nav-link" data-page="dashboard"><i class="bi bi-grid-1x2"></i> 工作台</a></li>
+        <li><a href="/admin/venues" class="nav-link" data-page="venues"><i class="bi bi-geo-alt"></i> 场地管理</a></li>
+        <li><a href="/admin/bookings" class="nav-link" data-page="bookings"><i class="bi bi-calendar-check"></i> 预约管理</a></li>
+        <li><a href="/admin/time-slots" class="nav-link" data-page="time-slots"><i class="bi bi-clock"></i> 时间段设置</a></li>
+        <li><a href="/admin/notifications" class="nav-link" data-page="notifications"><i class="bi bi-bell"></i> 通知管理</a></li>
+        <li><a href="/admin/users" class="nav-link" data-page="users" id="nav-admin-users"><i class="bi bi-people"></i> 管理员管理</a></li>
+      </ul>
+      <hr>
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle fs-5 me-2"></i>
+          <span id="admin-name">{{ name }}</span>
+          <span class="badge ms-2" id="role-badge" style="background: #ecf5f2; color: var(--dm-primary);">{{ role }}</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> 退出登录</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+      <!-- Topbar -->
+      <div class="topbar d-flex align-items-center px-3 py-2">
+        <button class="btn btn-sm d-md-none me-2" onclick="toggleSidebar()">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span class="text-muted" id="page-title">工作台</span>
+      </div>
+
+      <div class="p-4" id="content-area">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+      document.getElementById('sidebarBackdrop').classList.toggle('show');
+    }
+
+    async function logout() {
+      localStorage.removeItem('admin_token');
+      window.location.href = '/admin/login';
+    }
+
+    // Highlight active nav
+    const currentPage = window.location.pathname.split('/').pop() || 'dashboard';
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.dataset.page === currentPage) link.classList.add('active');
+    });
+  </script>
+</body>
+</html>

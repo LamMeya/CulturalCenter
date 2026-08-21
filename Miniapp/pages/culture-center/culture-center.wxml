@@ -1,0 +1,140 @@
+<!-- pages/culture-center/culture-center.wxml — 文化中心介绍 -->
+<scroll-view class="page-container" scroll-y>
+  <!-- Hero 区域 - 渔乡装饰 SVG -->
+  <view class="hero-section">
+    <view class="hero-svg">
+      <svg viewBox="0 0 750 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- 天空渐变 -->
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e8f4f0"/>
+            <stop offset="100%" stop-color="#faf8f6"/>
+          </linearGradient>
+          <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#b8d8cd"/>
+            <stop offset="100%" stop-color="#3d8e7a"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 天空 -->
+        <rect width="750" height="260" fill="url(#skyGrad)"/>
+
+        <!-- 太阳 -->
+        <circle cx="620" cy="80" r="40" fill="#e8a840" opacity="0.8"/>
+        <circle cx="620" cy="80" r="32" fill="#f0c860" opacity="0.6"/>
+
+        <!-- 远山 -->
+        <path d="M0,220 Q80,140 180,180 Q250,120 350,190 Q450,130 540,185 Q640,140 750,200 L750,260 L0,260 Z" fill="#c5dcd4" opacity="0.7"/>
+
+        <!-- 水面 -->
+        <rect y="260" width="750" height="140" fill="url(#waterGrad)"/>
+
+        <!-- 水波纹 -->
+        <path d="M0,280 Q50,270 100,280 Q150,290 200,280 Q250,270 300,280 Q350,290 400,280 Q450,270 500,280 Q550,290 600,280 Q650,270 700,280 Q750,290 750,280" fill="none" stroke="#b8d8cd" stroke-width="2" opacity="0.5"/>
+        <path d="M0,310 Q60,300 120,310 Q180,320 240,310 Q300,300 360,310 Q420,320 480,310 Q540,300 600,310 Q660,320 720,310 Q750,305 750,310" fill="none" stroke="#b8d8cd" stroke-width="2" opacity="0.4"/>
+
+        <!-- 渔船 -->
+        <path d="M120,310 Q140,290 180,290 Q220,290 240,310 Z" fill="#8c7b6a" opacity="0.7"/>
+        <line x1="180" y1="290" x2="180" y2="250" stroke="#8c7b6a" stroke-width="2" opacity="0.6"/>
+        <path d="M180,250 L220,270 L180,280 Z" fill="#e8a840" opacity="0.5"/>
+
+        <!-- 岸边建筑剪影 -->
+        <rect x="50" y="200" width="30" height="60" fill="#8c7b6a" opacity="0.4"/>
+        <rect x="90" y="180" width="40" height="80" fill="#8c7b6a" opacity="0.35"/>
+        <rect x="140" y="190" width="25" height="70" fill="#8c7b6a" opacity="0.3"/>
+        <polygon points="50,200 65,180 80,200" fill="#8c7b6a" opacity="0.5"/>
+        <polygon points="90,180 110,155 130,180" fill="#8c7b6a" opacity="0.4"/>
+
+        <!-- 飞鸟 -->
+        <path d="M580,100 Q590,95 600,100" fill="none" stroke="#8c7b6a" stroke-width="1.5" opacity="0.4"/>
+        <path d="M610,85 Q620,80 630,85" fill="none" stroke="#8c7b6a" stroke-width="1.5" opacity="0.3"/>
+      </svg>
+    </view>
+    <view class="hero-overlay">
+      <text class="hero-title">斗门文化中心</text>
+      <text class="hero-subtitle">渔乡文艺 · 文化传承</text>
+    </view>
+  </view>
+
+  <!-- 关于我们 -->
+  <view class="content-section">
+    <view class="section-header">
+      <view class="section-dot"></view>
+      <text class="section-title">关于我们</text>
+    </view>
+    <view class="card">
+      <text class="section-text">
+        斗门文化中心坐落于珠海市斗门区，是一座集文化展示、文艺演出、艺术培训、场地租赁于一体的综合性文化场馆。中心秉承"传承渔乡文化，丰富群众生活"的宗旨，为本地居民和文艺团体提供优质的公共文化服务。
+      </text>
+      <text class="section-text">
+        场馆内设有多功能厅、排练厅、展览厅、书画室、音乐室等多个功能区域，配备先进的灯光音响设备，可满足各类文艺活动和文化交流需求。
+      </text>
+    </view>
+  </view>
+
+  <!-- 场地设施 -->
+  <view class="content-section">
+    <view class="section-header">
+      <view class="section-dot"></view>
+      <text class="section-title">场地设施</text>
+    </view>
+    <view class="card">
+      <view class="facility-list">
+        <view class="facility-item" wx:for="{{['多功能演艺厅（可容纳300人）', '标准排练厅 × 3', '书画展览厅', '音乐教室', '舞蹈排练室', '会议室']}}" wx:key="*this">
+          <text class="facility-dot">·</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约规则 -->
+  <view class="content-section">
+    <view class="section-header">
+      <view class="section-dot"></view>
+      <text class="section-title">预约规则</text>
+    </view>
+    <view class="card rules-card">
+      <view class="rule-item" wx:for="{{rules}}" wx:key="*this">
+        <view class="rule-number">{{index + 1}}</view>
+        <text class="rule-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="content-section">
+    <view class="section-header">
+      <view class="section-dot"></view>
+      <text class="section-title">联系我们</text>
+    </view>
+    <view class="card contact-card">
+      <view class="contact-item" bindtap="onCopyAddress">
+        <text class="contact-icon">📍</text>
+        <view class="contact-info">
+          <text class="contact-label">地址</text>
+          <text class="contact-value">{{contact.address}}</text>
+        </view>
+        <text class="contact-action">复制</text>
+      </view>
+      <view class="contact-item" bindtap="onCallPhone">
+        <text class="contact-icon">📞</text>
+        <view class="contact-info">
+          <text class="contact-label">电话</text>
+          <text class="contact-value">{{contact.phone}}</text>
+        </view>
+        <text class="contact-action">拨打</text>
+      </view>
+      <view class="contact-item">
+        <text class="contact-icon">🕐</text>
+        <view class="contact-info">
+          <text class="contact-label">开放时间</text>
+          <text class="contact-value">{{contact.hours}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-spacer"></view>
+</scroll-view>

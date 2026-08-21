@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通知管理 — 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       Inline Brand CSS — 渔乡文艺风
+       ============================================ */
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+      --dm-primary-100: #dceee8;
+      --dm-primary-600: #2e7262;
+      --dm-neutral-700: #6b5d50;
+      --dm-neutral-800: #544a40;
+      --dm-neutral-950: #211c18;
+      --dm-muted-foreground: #8c7b6a;
+      --dm-ring: rgba(61, 142, 122, 0.3);
+      --state-success: #4caf7d;
+      --state-success-light: #e8f5ee;
+      --state-warning: #e8a840;
+      --state-warning-light: #fdf6e8;
+      --state-error: #d4644a;
+      --state-error-light: #fdf0ed;
+      --state-info: #5b9ecf;
+      --state-info-light: #eef5fb;
+      --font-heading: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', serif;
+      --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--dm-foreground);
+      background: var(--dm-background);
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.1rem; }
+
+    /* === Sidebar === */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--dm-card);
+      border-right: 1px solid var(--dm-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 40;
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--dm-border);
+    }
+
+    .sidebar-brand h1 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dm-primary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .sidebar-brand .subtitle {
+      font-size: 0.75rem;
+      color: var(--dm-muted-foreground);
+      margin-top: 2px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 8px;
+      overflow-y: auto;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--dm-radius-medium);
+      font-size: 0.9rem;
+      color: var(--dm-neutral-700);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-nav-item:hover {
+      background: var(--dm-muted);
+      color: var(--dm-neutral-950);
+    }
+
+    .sidebar-nav-item.active {
+      background: var(--dm-primary-100);
+      color: var(--dm-primary);
+      font-weight: 600;
+    }
+
+    .sidebar-nav-item .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--dm-border);
+      font-size: 0.8rem;
+      color: var(--dm-muted-foreground);
+    }
+
+    .sidebar-footer .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-footer .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* === Main Content === */
+    .main-content {
+      margin-left: 240px;
+      min-height: 100vh;
+      padding: 32px 40px;
+      background: var(--dm-background);
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.625rem;
+      font-weight: 700;
+      color: var(--dm-neutral-950);
+      margin: 0 0 4px 0;
+    }
+
+    .page-header .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--dm-muted-foreground);
+    }
+
+    /* === Card === */
+    .brand-card {
+      background: var(--dm-card);
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-lg);
+      padding: 24px;
+    }
+
+    .brand-card-header {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dm-neutral-950);
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--dm-border);
+    }
+
+    /* === Form Elements === */
+    .brand-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .brand-input:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px var(--dm-ring);
+    }
+
+    .brand-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      resize: vertical;
+      min-height: 120px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .brand-textarea:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px var(--dm-ring);
+    }
+
+    .brand-select {
+      padding: 10px 14px;
+      border: 1px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238c7b6a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .brand-select:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px var(--dm-ring);
+    }
+
+    .brand-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 24px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: var(--dm-radius-medium);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1.4;
+    }
+
+    .brand-btn-primary {
+      background: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+    }
+
+    .brand-btn-primary:hover {
+      background: var(--dm-primary-600);
+    }
+
+    .brand-btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .brand-btn-outline {
+      background: transparent;
+      color: var(--dm-primary);
+      border: 1.5px solid var(--dm-primary);
+    }
+
+    .brand-btn-outline:hover {
+      background: var(--dm-primary-100);
+    }
+
+    .brand-btn-ghost {
+      background: transparent;
+      color: var(--dm-muted-foreground);
+      padding: 8px 12px;
+    }
+
+    .brand-btn-ghost:hover {
+      background: var(--dm-muted);
+      color: var(--dm-neutral-950);
+    }
+
+    /* === Rich Text Toolbar === */
+    .richtext-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 10px;
+      background: var(--dm-muted);
+      border: 1px solid var(--dm-border);
+      border-bottom: none;
+      border-radius: var(--dm-radius-medium) var(--dm-radius-medium) 0 0;
+      flex-wrap: wrap;
+    }
+
+    .richtext-toolbar button {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--dm-neutral-700);
+      font-size: 0.85rem;
+      transition: all 0.12s ease;
+    }
+
+    .richtext-toolbar button:hover {
+      background: var(--dm-card);
+      border-color: var(--dm-border);
+    }
+
+    .richtext-toolbar button.active {
+      background: var(--dm-primary-100);
+      color: var(--dm-primary);
+      border-color: var(--dm-primary);
+    }
+
+    .richtext-toolbar .divider {
+      width: 1px;
+      height: 20px;
+      background: var(--dm-border);
+      margin: 0 4px;
+    }
+
+    .richtext-editor {
+      min-height: 150px;
+      padding: 12px 14px;
+      border: 1px solid var(--dm-border);
+      border-top: none;
+      border-radius: 0 0 var(--dm-radius-medium) var(--dm-radius-medium);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--dm-foreground);
+      background: var(--dm-card);
+      outline: none;
+      line-height: 1.7;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .richtext-editor:focus {
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 3px var(--dm-ring);
+    }
+
+    .richtext-editor[contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--dm-muted-foreground);
+      pointer-events: none;
+    }
+
+    /* === Mobile Preview === */
+    .phone-frame {
+      width: 320px;
+      background: #1a1a1a;
+      border-radius: 28px;
+      padding: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+
+    .phone-screen {
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 480px;
+    }
+
+    .phone-status-bar {
+      background: #f8f8f8;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: #333;
+      border-bottom: 1px solid #eee;
+    }
+
+    .phone-app-header {
+      padding: 12px 16px;
+      background: var(--dm-primary);
+      color: #fff;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .phone-notification-bar {
+      margin: 0;
+      padding: 10px 14px;
+      background: #fffbe6;
+      border-bottom: 1px solid #f0e8c0;
+      font-size: 0.78rem;
+      color: #8b6914;
+      line-height: 1.5;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .phone-notification-bar .bell-icon {
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+
+    .phone-notification-bar .notification-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .phone-content {
+      padding: 16px;
+      min-height: 300px;
+    }
+
+    .phone-card {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .phone-card h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0 0 4px;
+      color: #333;
+    }
+
+    .phone-card p {
+      font-size: 0.75rem;
+      color: #999;
+      margin: 0;
+    }
+
+    .phone-tab-bar {
+      display: flex;
+      border-top: 1px solid #eee;
+      background: #fafafa;
+      padding: 6px 0 2px;
+    }
+
+    .phone-tab {
+      flex: 1;
+      text-align: center;
+      font-size: 0.65rem;
+      color: #bbb;
+      padding: 6px 0;
+    }
+
+    .phone-tab.active {
+      color: var(--dm-primary);
+    }
+
+    .phone-tab .tab-icon {
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* === Notification History Table === */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .history-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--dm-muted-foreground);
+      border-bottom: 2px solid var(--dm-border);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .history-table td {
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--dm-border);
+      vertical-align: middle;
+    }
+
+    .history-table tr:hover td {
+      background: var(--dm-muted);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-published {
+      background: var(--state-success-light);
+      color: var(--state-success);
+    }
+
+    .status-draft {
+      background: var(--state-warning-light);
+      color: var(--state-warning);
+    }
+
+    .status-archived {
+      background: var(--dm-muted);
+      color: var(--dm-muted-foreground);
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--state-info-light);
+      color: var(--state-info);
+    }
+
+    .type-badge.system {
+      background: var(--state-error-light);
+      color: var(--state-error);
+    }
+
+    .type-badge.cancel {
+      background: var(--state-warning-light);
+      color: var(--state-warning);
+    }
+
+    /* === Responsive Grid === */
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+      .phone-frame {
+        width: 280px;
+      }
+    }
+
+    /* === Toast === */
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      padding: 14px 24px;
+      border-radius: var(--dm-radius-medium);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      background: var(--state-success);
+    }
+
+    .toast-error {
+      background: var(--state-error);
+    }
+
+    /* === Scrollbar === */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--dm-border);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--dm-neutral-300);
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>斗门文化中心</h1>
+      <div class="subtitle">后台管理系统</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="dashboard.html">
+        <span class="nav-icon">&#9703;</span>
+        <span>工作台</span>
+      </a>
+      <a class="sidebar-nav-item" href="venue-manage.html">
+        <span class="nav-icon">&#9871;</span>
+        <span>场地管理</span>
+      </a>
+      <a class="sidebar-nav-item" href="booking-manage.html">
+        <span class="nav-icon">&#9745;</span>
+        <span>预约管理</span>
+      </a>
+      <a class="sidebar-nav-item" href="time-slots.html">
+        <span class="nav-icon">&#9200;</span>
+        <span>时间段设置</span>
+      </a>
+      <a class="sidebar-nav-item active" href="notifications.html">
+        <span class="nav-icon">&#128276;</span>
+        <span>通知管理</span>
+      </a>
+      <a class="sidebar-nav-item" href="admin-users.html">
+        <span class="nav-icon">&#128100;</span>
+        <span>管理员管理</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">张</div>
+        <div>
+          <div style="font-weight:600;color:var(--dm-neutral-950);">张三</div>
+          <div style="font-size:0.75rem;">超级管理员</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="breadcrumb">首页 / 通知管理</div>
+      <h2>通知管理</h2>
+    </div>
+
+    <!-- Notification Type + Editor -->
+    <div class="editor-grid">
+      <!-- Left: Editor -->
+      <div class="brand-card" data-dom-id="notification-editor">
+        <div class="brand-card-header">编辑通知</div>
+
+        <!-- Notification Type -->
+        <div style="margin-bottom: 16px;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--dm-neutral-700);margin-bottom:6px;">通知类型</label>
+          <select class="brand-select" id="notificationType" style="width:100%;" onchange="handleTypeChange()">
+            <option value="normal">普通通知</option>
+            <option value="cancel">取消预约提醒</option>
+            <option value="system">系统公告</option>
+          </select>
+        </div>
+
+        <!-- Notification Title -->
+        <div style="margin-bottom: 12px;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--dm-neutral-700);margin-bottom:6px;">通知标题</label>
+          <input type="text" class="brand-input" id="notificationTitle" placeholder="请输入通知标题" oninput="updatePreview()">
+        </div>
+
+        <!-- Rich Text Editor -->
+        <div style="margin-bottom: 16px;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--dm-neutral-700);margin-bottom:6px;">通知内容</label>
+          <div class="richtext-toolbar">
+            <button title="加粗" onclick="execCmd('bold')"><b>B</b></button>
+            <button title="斜体" onclick="execCmd('italic')"><i>I</i></button>
+            <button title="下划线" onclick="execCmd('underline')"><u>U</u></button>
+            <span class="divider"></span>
+            <button title="无序列表" onclick="execCmd('insertUnorderedList')">&#9776;</button>
+            <button title="有序列表" onclick="execCmd('insertOrderedList')">&#8545;</button>
+            <span class="divider"></span>
+            <button title="增大字号" onclick="execCmd('fontSize', '4')">A+</button>
+            <button title="减小字号" onclick="execCmd('fontSize', '2')">A-</button>
+            <span class="divider"></span>
+            <button title="文字颜色" onclick="changeTextColor()" style="position:relative;">
+              <span style="display:inline-block;width:14px;height:14px;border-radius:2px;background:var(--dm-primary);border:1px solid #ccc;"></span>
+            </button>
+            <button title="清除格式" onclick="execCmd('removeFormat')">&#8634;</button>
+          </div>
+          <div
+            id="richEditor"
+            class="richtext-editor"
+            contenteditable="true"
+            data-placeholder="请输入通知内容，支持富文本格式..."
+            oninput="updatePreview()"
+          ></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="brand-btn brand-btn-primary" data-dom-id="publish-btn" onclick="publishNotification()">
+            <span>&#128276;</span> 发布通知
+          </button>
+          <button class="brand-btn brand-btn-ghost" onclick="clearEditor()">
+            清空
+          </button>
+          <button class="brand-btn brand-btn-outline" onclick="saveDraft()">
+            保存草稿
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Mobile Preview -->
+      <div class="brand-card" data-dom-id="preview-area" style="display:flex;flex-direction:column;align-items:center;">
+        <div class="brand-card-header" style="text-align:center;">手机端预览</div>
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <span style="display:flex;gap:4px;">
+                <span>&#9679;&#9679;&#9679;&#9679;</span>
+                <span>&#128246;</span>
+              </span>
+            </div>
+            <div class="phone-app-header">斗门文化中心</div>
+            <div class="phone-notification-bar" id="previewNotificationBar">
+              <span class="bell-icon">&#128276;</span>
+              <span class="notification-text" id="previewNotificationText">欢迎来到斗门文化中心，请查看最新活动安排。</span>
+            </div>
+            <div class="phone-content">
+              <div class="phone-card">
+                <h4>书法体验课</h4>
+                <p>多功能厅 &middot; 08月15日 14:00-16:00</p>
+              </div>
+              <div class="phone-card">
+                <h4>国画基础班</h4>
+                <p>书画室 &middot; 08月16日 09:00-11:00</p>
+              </div>
+              <div class="phone-card">
+                <h4>渔歌排练</h4>
+                <p>排练厅 &middot; 08月17日 15:00-17:00</p>
+              </div>
+            </div>
+            <div class="phone-tab-bar">
+              <div class="phone-tab active">
+                <span class="tab-icon">&#127968;</span>
+                首页
+              </div>
+              <div class="phone-tab">
+                <span class="tab-icon">&#128197;</span>
+                预约
+              </div>
+              <div class="phone-tab">
+                <span class="tab-icon">&#128214;</span>
+                活动
+              </div>
+              <div class="phone-tab">
+                <span class="tab-icon">&#128100;</span>
+                我的
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:0.78rem;color:var(--dm-muted-foreground);text-align:center;">
+          此预览模拟通知在手机端首页通知栏的显示效果
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification History -->
+    <div class="brand-card" data-dom-id="notification-history-list" style="margin-top:24px;">
+      <div class="brand-card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>已发布通知</span>
+        <span style="font-size:0.8rem;font-weight:400;color:var(--dm-muted-foreground);">共 <span id="historyCount">3</span> 条</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>通知类型</th>
+              <th>标题</th>
+              <th>内容摘要</th>
+              <th>发布时间</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td><span class="type-badge">普通通知</span></td>
+              <td>暑期活动安排通知</td>
+              <td>暑期期间，文化中心将举办一系列传统文化体验活动，包括书法、国画、渔歌排练等...</td>
+              <td>2026-08-10 14:30</td>
+              <td><span class="status-badge status-published">&#9679; 已发布</span></td>
+              <td>
+                <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="editHistory(this)">编辑</button>
+                <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;color:var(--state-error);" onclick="archiveHistory(this)">归档</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="type-badge cancel">取消预约提醒</span></td>
+              <td>8月12日排练厅预约取消通知</td>
+              <td>因场地维护，8月12日下午排练厅预约已取消，请相关团队重新预约其他时段...</td>
+              <td>2026-08-09 09:15</td>
+              <td><span class="status-badge status-published">&#9679; 已发布</span></td>
+              <td>
+                <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="editHistory(this)">编辑</button>
+                <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;color:var(--state-error);" onclick="archiveHistory(this)">归档</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="type-badge system">系统公告</span></td>
+              <td>系统维护通知</td>
+              <td>文化中心预约系统将于8月20日凌晨2:00-4:00进行系统升级维护，届时预约功能暂停使用...</td>
+              <td>2026-08-08 16:45</td>
+              <td><span class="status-badge status-archived">&#9679; 已归档</span></td>
+              <td>
+                <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="repostHistory(this)">重新发布</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ===== Rich Text Editor =====
+    const richEditor = document.getElementById('richEditor');
+
+    function execCmd(command, value) {
+      document.execCommand(command, false, value || null);
+      richEditor.focus();
+      updatePreview();
+    }
+
+    function changeTextColor() {
+      const color = prompt('请输入颜色值（例如：#3d8e7a, red, rgb(61,142,122)）：', '#3d8e7a');
+      if (color) {
+        execCmd('foreColor', color);
+      }
+    }
+
+    // ===== Preview Update =====
+    function updatePreview() {
+      const title = document.getElementById('notificationTitle').value.trim();
+      const content = richEditor.innerHTML.trim();
+      const previewText = document.getElementById('previewNotificationText');
+
+      if (title && content) {
+        const textContent = richEditor.textContent.trim();
+        previewText.textContent = title + '：' + textContent.substring(0, 40) + (textContent.length > 40 ? '...' : '');
+      } else if (title) {
+        previewText.textContent = title;
+      } else if (content) {
+        const textContent = richEditor.textContent.trim();
+        previewText.textContent = textContent.substring(0, 50) + (textContent.length > 50 ? '...' : '');
+      } else {
+        previewText.textContent = '欢迎来到斗门文化中心，请查看最新活动安排。';
+      }
+    }
+
+    function handleTypeChange() {
+      const type = document.getElementById('notificationType').value;
+      const bar = document.getElementById('previewNotificationBar');
+
+      // Update preview bar style based on type
+      if (type === 'system') {
+        bar.style.background = '#fdf0ed';
+        bar.style.borderBottomColor = '#f5d0c8';
+        bar.style.color = '#d4644a';
+      } else if (type === 'cancel') {
+        bar.style.background = '#fdf6e8';
+        bar.style.borderBottomColor = '#f0d8a0';
+        bar.style.color = '#c88a20';
+      } else {
+        bar.style.background = '#fffbe6';
+        bar.style.borderBottomColor = '#f0e8c0';
+        bar.style.color = '#8b6914';
+      }
+    }
+
+    // ===== Publish =====
+    function publishNotification() {
+      const title = document.getElementById('notificationTitle').value.trim();
+      const content = richEditor.innerHTML.trim();
+      const type = document.getElementById('notificationType').value;
+
+      if (!title || !content) {
+        showToast('请填写通知标题和内容', 'error');
+        return;
+      }
+
+      const typeLabel = type === 'normal' ? '普通通知' : (type === 'cancel' ? '取消预约提醒' : '系统公告');
+      const typeClass = type === 'normal' ? '' : (type === 'cancel' ? 'cancel' : 'system');
+      const now = new Date();
+      const timeStr = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0');
+
+      const textContent = richEditor.textContent.trim();
+      const summary = textContent.substring(0, 50) + (textContent.length > 50 ? '...' : '');
+
+      const tbody = document.getElementById('historyTableBody');
+      const newRow = document.createElement('tr');
+
+      newRow.innerHTML = `
+        <td><span class="type-badge ${typeClass}">${typeLabel}</span></td>
+        <td>${escapeHtml(title)}</td>
+        <td>${escapeHtml(summary)}</td>
+        <td>${timeStr}</td>
+        <td><span class="status-badge status-published">&#9679; 已发布</span></td>
+        <td>
+          <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="editHistory(this)">编辑</button>
+          <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;color:var(--state-error);" onclick="archiveHistory(this)">归档</button>
+        </td>
+      `;
+
+      tbody.insertBefore(newRow, tbody.firstChild);
+      updateHistoryCount();
+
+      showToast('通知已成功发布！', 'success');
+      clearEditor();
+    }
+
+    function saveDraft() {
+      const title = document.getElementById('notificationTitle').value.trim();
+      const content = richEditor.innerHTML.trim();
+
+      if (!title && !content) {
+        showToast('没有可保存的内容', 'error');
+        return;
+      }
+
+      showToast('草稿已保存', 'success');
+    }
+
+    function clearEditor() {
+      document.getElementById('notificationTitle').value = '';
+      richEditor.innerHTML = '';
+      document.getElementById('notificationType').value = 'normal';
+      handleTypeChange();
+      updatePreview();
+    }
+
+    // ===== History Actions =====
+    function editHistory(btn) {
+      const row = btn.closest('tr');
+      const cells = row.querySelectorAll('td');
+      const typeBadge = cells[0].querySelector('.type-badge').textContent.trim();
+      const title = cells[1].textContent.trim();
+
+      // Map type label back to value
+      const typeMap = { '普通通知': 'normal', '取消预约提醒': 'cancel', '系统公告': 'system' };
+      const typeValue = typeMap[typeBadge] || 'normal';
+
+      document.getElementById('notificationType').value = typeValue;
+      document.getElementById('notificationTitle').value = title;
+      handleTypeChange();
+
+      richEditor.focus();
+      showToast('已加载通知内容到编辑器', 'success');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function archiveHistory(btn) {
+      const row = btn.closest('tr');
+      const statusCell = row.querySelectorAll('td')[4];
+      const actionCell = row.querySelectorAll('td')[5];
+
+      statusCell.innerHTML = '<span class="status-badge status-archived">&#9679; 已归档</span>';
+      actionCell.innerHTML = '<button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="repostHistory(this)">重新发布</button>';
+
+      showToast('通知已归档', 'success');
+    }
+
+    function repostHistory(btn) {
+      const row = btn.closest('tr');
+      const statusCell = row.querySelectorAll('td')[4];
+      const actionCell = row.querySelectorAll('td')[5];
+
+      const now = new Date();
+      const timeStr = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0');
+
+      row.querySelectorAll('td')[3].textContent = timeStr;
+      statusCell.innerHTML = '<span class="status-badge status-published">&#9679; 已发布</span>';
+      actionCell.innerHTML = `
+        <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;" onclick="editHistory(this)">编辑</button>
+        <button class="brand-btn brand-btn-ghost" style="font-size:0.8rem;padding:4px 8px;color:var(--state-error);" onclick="archiveHistory(this)">归档</button>
+      `;
+
+      showToast('通知已重新发布', 'success');
+    }
+
+    function updateHistoryCount() {
+      const tbody = document.getElementById('historyTableBody');
+      document.getElementById('historyCount').textContent = tbody.querySelectorAll('tr').length;
+    }
+
+    // ===== Helpers =====
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast toast-' + type + ' show';
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // ===== Rich Text: Paste plain text =====
+    richEditor.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, text);
+      updatePreview();
+    });
+
+    // ===== Initialize ====
+    updatePreview();
+  </script>
+</body>
+</html>

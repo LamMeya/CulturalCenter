@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>场地详情与预约 - 斗门文化中心</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dm-background: #faf8f6;
+      --dm-foreground: #211c18;
+      --dm-card: #ffffff;
+      --dm-primary: #3d8e7a;
+      --dm-primary-foreground: #ffffff;
+      --dm-muted: #f5f0eb;
+      --dm-border: #ebe3da;
+      --dm-radius-lg: 12px;
+      --dm-radius-medium: 8px;
+      --dm-accent: #e8a840;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: var(--dm-background);
+      color: var(--dm-foreground);
+    }
+
+    h1, h2, h3 {
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .slot-card {
+      background-color: var(--dm-card);
+      border: 1.5px solid var(--dm-border);
+      border-radius: var(--dm-radius-medium);
+      transition: all 0.2s ease;
+    }
+
+    .slot-card:hover {
+      border-color: var(--dm-primary);
+    }
+
+    .slot-card.selected {
+      background-color: #ecf5f2;
+      border-color: var(--dm-primary);
+      box-shadow: 0 0 0 2px rgba(61, 142, 122, 0.15);
+    }
+
+    .slot-card.selected .slot-indicator {
+      background-color: var(--dm-primary);
+      color: white;
+    }
+
+    .slot-indicator {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--dm-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background-color: var(--dm-primary);
+      color: var(--dm-primary-foreground);
+      border-radius: var(--dm-radius-medium);
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:active {
+      background-color: #2e6e5e;
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      background-color: #b0cbc4;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body class="max-w-md mx-auto min-h-screen">
+
+  <!-- ===== Back Button ===== -->
+  <div class="sticky top-0 z-30 bg-[var(--dm-background)]/90 backdrop-blur-sm px-4 py-3 flex items-center">
+    <button
+      data-dom-id="btn-back"
+      onclick="history.back()"
+      class="flex items-center gap-2 text-[var(--dm-foreground)] hover:opacity-70 transition-opacity"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      <span class="text-sm font-medium">返回</span>
+    </button>
+  </div>
+
+  <!-- ===== Hero Image ===== -->
+  <div class="relative w-full h-56 overflow-hidden">
+    <svg viewBox="0 0 400 224" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 w-full h-full">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7ec8b5"/>
+          <stop offset="40%" stop-color="#3d8e7a"/>
+          <stop offset="100%" stop-color="#2a6b5c"/>
+        </linearGradient>
+        <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3d8e7a" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#1e4d42"/>
+        </linearGradient>
+        <linearGradient id="sunGlow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f5d88a" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#e8a840" stop-opacity="0.2"/>
+        </linearGradient>
+      </defs>
+      <!-- Sky -->
+      <rect width="400" height="140" fill="url(#skyGrad)"/>
+      <!-- Sun/glow -->
+      <circle cx="310" cy="40" r="60" fill="url(#sunGlow)"/>
+      <circle cx="310" cy="40" r="28" fill="#f5d88a" opacity="0.7"/>
+      <!-- Distant mountains -->
+      <polygon points="0,120 60,80 120,110 200,70 280,100 340,85 400,115 400,140 0,140" fill="#2a6b5c" opacity="0.5"/>
+      <!-- Water -->
+      <rect x="0" y="140" width="400" height="84" fill="url(#waterGrad)"/>
+      <!-- Water ripples -->
+      <path d="M0,150 Q50,146 100,150 Q150,154 200,150 Q250,146 300,150 Q350,154 400,150" fill="none" stroke="#5aad99" stroke-width="1" opacity="0.4"/>
+      <path d="M0,160 Q50,157 100,160 Q150,163 200,160 Q250,157 300,160 Q350,163 400,160" fill="none" stroke="#5aad99" stroke-width="0.8" opacity="0.3"/>
+      <path d="M0,172 Q50,169 100,172 Q150,175 200,172 Q250,169 300,172 Q350,175 400,172" fill="none" stroke="#5aad99" stroke-width="0.6" opacity="0.2"/>
+      <!-- Cultural building - left pagoda -->
+      <rect x="28" y="70" width="6" height="70" fill="#faf8f6" opacity="0.9"/>
+      <rect x="22" y="88" width="18" height="4" fill="#faf8f6" opacity="0.9"/>
+      <rect x="22" y="76" width="18" height="4" fill="#faf8f6" opacity="0.9"/>
+      <polygon points="18,76 31,60 44,76" fill="#faf8f6" opacity="0.9"/>
+      <polygon points="22,88 31,75 40,88" fill="#faf8f6" opacity="0.9"/>
+      <!-- Cultural building - center hall -->
+      <rect x="160" y="80" width="80" height="60" fill="#faf8f6" opacity="0.95"/>
+      <rect x="155" y="75" width="90" height="10" fill="#faf8f6" opacity="0.95"/>
+      <polygon points="150,80 200,55 250,80" fill="#faf8f6" opacity="0.95"/>
+      <polygon points="140,85 200,60 260,85" fill="#faf8f6" opacity="0.85"/>
+      <!-- Windows on center hall -->
+      <rect x="175" y="95" width="12" height="16" rx="2" fill="#3d8e7a" opacity="0.5"/>
+      <rect x="195" y="95" width="12" height="16" rx="2" fill="#3d8e7a" opacity="0.5"/>
+      <rect x="215" y="95" width="12" height="16" rx="2" fill="#3d8e7a" opacity="0.5"/>
+      <!-- Cultural building - right small pavilion -->
+      <rect x="330" y="95" width="28" height="45" fill="#faf8f6" opacity="0.9"/>
+      <polygon points="325,95 344,78 363,95" fill="#faf8f6" opacity="0.9"/>
+      <!-- Fishing lanterns -->
+      <circle cx="80" cy="55" r="8" fill="#e8a840" opacity="0.8"/>
+      <rect x="79" y="63" width="2" height="8" fill="#e8a840" opacity="0.6"/>
+      <circle cx="260" cy="45" r="8" fill="#e8a840" opacity="0.7"/>
+      <rect x="259" y="53" width="2" height="8" fill="#e8a840" opacity="0.5"/>
+      <!-- Reflection in water -->
+      <rect x="160" y="145" width="80" height="30" fill="#faf8f6" opacity="0.12"/>
+      <polygon points="150,145 200,160 250,145" fill="#faf8f6" opacity="0.08"/>
+      <!-- Small boat -->
+      <path d="M80,175 Q100,168 140,175" fill="none" stroke="#faf8f6" stroke-width="2" opacity="0.5"/>
+      <path d="M90,175 L78,168 L92,172 Z" fill="#faf8f6" opacity="0.4"/>
+    </svg>
+    <!-- Overlay gradient for text readability -->
+    <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/30 to-transparent"></div>
+    <div class="absolute bottom-4 left-4 right-4">
+      <h1 class="text-white text-xl font-bold drop-shadow-md" style="font-family: 'Noto Serif SC', serif;">斗门水乡文化大礼堂</h1>
+      <p class="text-white/80 text-sm mt-1 drop-shadow-sm">Doumen Water Town Cultural Hall</p>
+    </div>
+  </div>
+
+  <!-- ===== Main Content ===== -->
+  <div class="px-4 py-5 space-y-5">
+
+    <!-- Venue Info Card -->
+    <div class="bg-[var(--dm-card)] rounded-[var(--dm-radius-lg)] p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-3">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span class="text-sm text-[var(--dm-primary)] font-medium">珠海市斗门区 · 斗门旧街旁</span>
+      </div>
+      <p class="text-[var(--dm-foreground)] text-sm leading-relaxed">
+        斗门水乡文化大礼堂坐落于斗门旧街核心区域，建筑融合岭南水乡传统风格与现代设施，可承办文艺演出、书画展览、非遗体验、社区聚会等各类文化活动。场馆依水而建，推窗可见古河道与百年榕树，是体验渔乡文化的理想场所。
+      </p>
+    </div>
+
+    <!-- Capacity & Facilities -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-[var(--dm-card)] rounded-[var(--dm-radius-medium)] p-3 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-[#ecf5f2] flex items-center justify-center flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="text-xs text-[var(--dm-foreground)]/60">容纳人数</div>
+          <div class="text-lg font-semibold text-[var(--dm-foreground)]">80-120<span class="text-sm font-normal">人</span></div>
+        </div>
+      </div>
+      <div class="bg-[var(--dm-card)] rounded-[var(--dm-radius-medium)] p-3 shadow-sm flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-[#ecf5f2] flex items-center justify-center flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="text-xs text-[var(--dm-foreground)]/60">场地面积</div>
+          <div class="text-lg font-semibold text-[var(--dm-foreground)]">260<span class="text-sm font-normal">m²</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facilities -->
+    <div class="bg-[var(--dm-card)] rounded-[var(--dm-radius-lg)] p-4 shadow-sm">
+      <h3 class="text-base font-semibold mb-3" style="font-family: 'Noto Serif SC', serif;">设施与服务</h3>
+      <div class="flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          投影设备
+        </span>
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5"/><path d="M18 3l4 4-4 4"/></svg>
+          音响系统
+        </span>
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          空调系统
+        </span>
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          休息区
+        </span>
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          停车位
+        </span>
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--dm-muted)] rounded-full text-xs text-[var(--dm-foreground)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          非遗展示区
+        </span>
+      </div>
+    </div>
+
+    <!-- Step 1: Date Selection -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-semibold" style="font-family: 'Noto Serif SC', serif;">选择预约日期</h3>
+        <span class="text-xs text-[var(--dm-foreground)]/50">未来2周可约 · 周一除外</span>
+      </div>
+      <div id="date-scroll" class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+        <!-- Dates injected by JS -->
+      </div>
+      <p id="date-hint" class="text-xs text-[var(--dm-foreground)]/40 mt-2 text-center">请先选择日期</p>
+    </div>
+
+    <!-- Step 2: Time Slot Selection (hidden until date selected) -->
+    <div id="time-slots-section" class="hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-semibold" style="font-family: 'Noto Serif SC', serif;">选择时间段</h3>
+        <span class="text-xs text-[var(--dm-foreground)]/50" id="slot-count">已选 0/4</span>
+      </div>
+
+      <!-- Morning Section -->
+      <div class="mb-3">
+        <div class="flex items-center gap-2 mb-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dm-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <span class="text-sm font-medium text-[var(--dm-foreground)]">上午</span>
+          <span class="text-xs text-[var(--dm-foreground)]/50">9:00 - 11:50</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="slot-card p-3 cursor-pointer select-none" data-dom-id="slot-1" data-slot="1" onclick="toggleSlot(this)">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-[var(--dm-foreground)]">9:00 - 10:30</div>
+                <div class="text-xs text-[var(--dm-foreground)]/50 mt-0.5">90分钟</div>
+              </div>
+              <div class="slot-indicator">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hidden check-icon">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="slot-card p-3 cursor-pointer select-none" data-dom-id="slot-2" data-slot="2" onclick="toggleSlot(this)">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-[var(--dm-foreground)]">10:20 - 11:50</div>
+                <div class="text-xs text-[var(--dm-foreground)]/50 mt-0.5">90分钟</div>
+              </div>
+              <div class="slot-indicator">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hidden check-icon">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Afternoon Section -->
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dm-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="text-sm font-medium text-[var(--dm-foreground)]">下午</span>
+          <span class="text-xs text-[var(--dm-foreground)]/50">14:10 - 17:50</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="slot-card p-3 cursor-pointer select-none" data-dom-id="slot-3" data-slot="3" onclick="toggleSlot(this)">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-[var(--dm-foreground)]">14:10 - 15:40</div>
+                <div class="text-xs text-[var(--dm-foreground)]/50 mt-0.5">90分钟</div>
+              </div>
+              <div class="slot-indicator">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hidden check-icon">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="slot-card p-3 cursor-pointer select-none" data-dom-id="slot-4" data-slot="4" onclick="toggleSlot(this)">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-[var(--dm-foreground)]">15:30 - 17:00</div>
+                <div class="text-xs text-[var(--dm-foreground)]/50 mt-0.5">90分钟</div>
+              </div>
+              <div class="slot-indicator">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hidden check-icon">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="slot-card p-3 cursor-pointer select-none" data-dom-id="slot-5" data-slot="5" onclick="toggleSlot(this)">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-[var(--dm-foreground)]">16:40 - 17:50</div>
+                <div class="text-xs text-[var(--dm-foreground)]/50 mt-0.5">70分钟</div>
+              </div>
+              <div class="slot-indicator">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hidden check-icon">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacer for fixed bottom button -->
+    <div class="h-24"></div>
+  </div>
+
+  <!-- ===== Fixed Bottom Booking Button ===== -->
+  <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 py-3 bg-[var(--dm-background)]/95 backdrop-blur-sm border-t border-[var(--dm-border)] z-30">
+    <button
+      data-dom-id="btn-booking"
+      id="btn-booking"
+      onclick="submitBooking()"
+      disabled
+      class="btn-primary w-full py-3.5 text-base flex items-center justify-center gap-2"
+    >
+      <span>立即预约</span>
+      <span id="btn-slot-hint" class="text-xs opacity-70">请选择时间段</span>
+    </button>
+  </div>
+
+  <!-- ===== Success Modal ===== -->
+  <div id="success-overlay" class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center hidden" onclick="closeSuccess(event)">
+    <div class="bg-[var(--dm-card)] rounded-[var(--dm-radius-lg)] mx-4 p-6 shadow-xl max-w-sm w-full animate-[fadeIn_0.3s_ease]" onclick="event.stopPropagation()">
+      <div class="flex flex-col items-center text-center">
+        <!-- Success icon -->
+        <div class="w-16 h-16 rounded-full bg-[#ecf5f2] flex items-center justify-center mb-4">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--dm-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold mb-2" style="font-family: 'Noto Serif SC', serif;">预约已提交</h3>
+        <p class="text-sm text-[var(--dm-foreground)]/70 leading-relaxed">
+          等待管理员抽签，结果将在预约日期前<span class="text-[var(--dm-primary)] font-medium">2天</span>公布
+        </p>
+        <div class="mt-4 w-full bg-[var(--dm-muted)] rounded-[var(--dm-radius-medium)] p-3 text-left">
+          <div class="text-xs text-[var(--dm-foreground)]/50 mb-1">已选时间段</div>
+          <div id="selected-slots-display" class="text-sm text-[var(--dm-foreground)] font-medium"></div>
+        </div>
+        <button
+          onclick="closeSuccess()"
+          class="mt-4 w-full py-2.5 rounded-[var(--dm-radius-medium)] border border-[var(--dm-border)] text-sm font-medium text-[var(--dm-foreground)] hover:bg-[var(--dm-muted)] transition-colors"
+        >
+          我知道了
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <script>
+    const MAX_SLOTS = 4;
+    let selectedSlots = new Set();
+    let selectedDate = null;
+    let selectedDateLabel = '';
+
+    // ===== Date Generation =====
+    const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+    function generateDates() {
+      const container = document.getElementById('date-scroll');
+      const today = new Date(2026, 7, 11); // 2026-08-11 Tuesday
+      const dates = [];
+      let current = new Date(today);
+      const end = new Date(today);
+      end.setDate(end.getDate() + 14);
+
+      while (current <= end) {
+        const dayOfWeek = current.getDay();
+        // Exclude Mondays
+        if (dayOfWeek !== 1) {
+          const d = new Date(current);
+          dates.push({
+            date: d,
+            month: d.getMonth() + 1,
+            day: d.getDate(),
+            weekDay: weekDays[dayOfWeek],
+            isToday: d.toDateString() === today.toDateString()
+          });
+        }
+        current.setDate(current.getDate() + 1);
+      }
+
+      dates.forEach((d, idx) => {
+        const el = document.createElement('div');
+        el.className = 'date-chip flex-shrink-0 w-[72px] py-2.5 rounded-[var(--dm-radius-medium)] text-center cursor-pointer select-none transition-all duration-200 border-2';
+        el.dataset.date = d.date.toISOString();
+        el.dataset.label = d.month + '月' + d.day + '日 ' + d.weekDay;
+        el.dataset.domId = 'date-' + idx;
+        el.setAttribute('data-dom-id', 'date-' + idx);
+        el.onclick = function() { selectDate(this, d); };
+
+        // Default styling
+        el.style.backgroundColor = 'var(--dm-card)';
+        el.style.borderColor = 'var(--dm-border)';
+
+        el.innerHTML = `
+          <div class="text-xs text-[var(--dm-foreground)]/50">${d.month}月</div>
+          <div class="text-lg font-semibold text-[var(--dm-foreground)] leading-tight">${d.day}</div>
+          <div class="text-xs text-[var(--dm-foreground)]/50">${d.weekDay}</div>
+          ${d.isToday ? '<div class="text-[10px] text-[var(--dm-primary)] font-medium mt-0.5">今天</div>' : ''}
+        `;
+
+        container.appendChild(el);
+      });
+    }
+
+    function selectDate(el, dateObj) {
+      // Remove all active
+      document.querySelectorAll('.date-chip').forEach(chip => {
+        chip.style.backgroundColor = 'var(--dm-card)';
+        chip.style.borderColor = 'var(--dm-border)';
+        chip.classList.remove('date-active');
+      });
+
+      // Set active
+      el.style.backgroundColor = '#ecf5f2';
+      el.style.borderColor = 'var(--dm-primary)';
+      el.classList.add('date-active');
+
+      selectedDate = dateObj.date;
+      selectedDateLabel = el.dataset.label;
+
+      // Show time slots
+      document.getElementById('time-slots-section').classList.remove('hidden');
+      document.getElementById('date-hint').textContent = '已选：' + el.dataset.label;
+
+      // Reset slot selection
+      resetSlots();
+      updateBookingButton();
+    }
+
+    // ===== Slot Selection =====
+    function toggleSlot(el) {
+      if (!selectedDate) return;
+
+      const slotId = el.dataset.slot;
+      const checkIcon = el.querySelector('.check-icon');
+
+      if (selectedSlots.has(slotId)) {
+        selectedSlots.delete(slotId);
+        el.classList.remove('selected');
+        checkIcon.classList.add('hidden');
+      } else {
+        if (selectedSlots.size >= MAX_SLOTS) {
+          shakeElement(el);
+          return;
+        }
+        selectedSlots.add(slotId);
+        el.classList.add('selected');
+        checkIcon.classList.remove('hidden');
+      }
+
+      updateBookingButton();
+    }
+
+    function resetSlots() {
+      selectedSlots.clear();
+      document.querySelectorAll('.slot-card.selected').forEach(el => {
+        el.classList.remove('selected');
+        el.querySelector('.check-icon').classList.add('hidden');
+      });
+    }
+
+    function shakeElement(el) {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = 'shake 0.4s ease';
+      setTimeout(() => { el.style.animation = ''; }, 400);
+    }
+
+    function updateBookingButton() {
+      const btn = document.getElementById('btn-booking');
+      const hint = document.getElementById('btn-slot-hint');
+      const countEl = document.getElementById('slot-count');
+
+      countEl.textContent = '已选 ' + selectedSlots.size + '/' + MAX_SLOTS;
+
+      if (selectedDate && selectedSlots.size > 0) {
+        btn.disabled = false;
+        hint.textContent = '(' + selectedSlots.size + '个时间段)';
+      } else if (selectedDate && selectedSlots.size === 0) {
+        btn.disabled = true;
+        hint.textContent = '请选择时间段';
+      } else {
+        btn.disabled = true;
+        hint.textContent = '请先选择日期';
+      }
+    }
+
+    function submitBooking() {
+      if (!selectedDate || selectedSlots.size === 0) return;
+
+      const slotLabels = {
+        '1': '上午 9:00 - 10:30',
+        '2': '上午 10:20 - 11:50',
+        '3': '下午 14:10 - 15:40',
+        '4': '下午 15:30 - 17:00',
+        '5': '下午 16:40 - 17:50'
+      };
+
+      const sorted = [...selectedSlots].sort();
+      const displayText = selectedDateLabel + '\n' + sorted.map(id => slotLabels[id]).join('\n');
+      document.getElementById('selected-slots-display').textContent = displayText;
+
+      document.getElementById('success-overlay').classList.remove('hidden');
+    }
+
+    function closeSuccess(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('success-overlay').classList.add('hidden');
+      resetSlots();
+      updateBookingButton();
+    }
+
+    // Add shake animation
+    const shakeStyle = document.createElement('style');
+    shakeStyle.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-4px); }
+        40% { transform: translateX(4px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+      }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    `;
+    document.head.appendChild(shakeStyle);
+
+    // Init dates on load
+    generateDates();
+  </script>
+
+</body>
+</html>

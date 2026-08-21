@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理员管理 - 斗门文化中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --dm-primary: #3d8e7a; --dm-primary-dark: #2e6e5e; --dm-bg: #faf8f6; --dm-card: #ffffff; --dm-border: #ebe3da; --dm-text: #211c18; --dm-muted: #8c7b6a; --dm-accent: #e8a840; --dm-radius: 12px; --state-success: #4caf7d; --state-error: #d4644a; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; background: var(--dm-bg); color: var(--dm-text); font-size: 14px; }
+h1,h2,h3 { font-family: 'Noto Serif SC', serif; }
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: #1a3a32; color: #fff; flex-shrink: 0; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; transition: transform 0.3s; }
+.sidebar-logo { padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-logo h2 { font-size: 1rem; font-weight: 700; letter-spacing: 0.04em; }
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: rgba(255,255,255,0.7); text-decoration: none; border-radius: 8px; font-size: 0.9rem; margin: 2px 0; transition: all 0.2s; }
+.sidebar-nav a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sidebar-nav a.active { background: var(--dm-primary); color: #fff; font-weight: 500; }
+.sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; }
+.sidebar-footer .logout-btn { color: rgba(255,255,255,0.5); cursor: pointer; margin-top: 4px; display: inline-block; font-size: 0.75rem; }
+.sidebar-footer .logout-btn:hover { color: var(--dm-accent); }
+.main { flex: 1; margin-left: 220px; }
+.topbar { background: var(--dm-card); border-bottom: 1px solid var(--dm-border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.topbar .menu-btn { display: none; background: none; border: none; cursor: pointer; color: var(--dm-text); padding: 4px; }
+.topbar .page-title { font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 600; }
+.content { padding: 24px; max-width: 900px; }
+.card { background: var(--dm-card); border: 1px solid var(--dm-border); border-radius: var(--dm-radius); padding: 20px; margin-bottom: 20px; }
+.card h3 { font-size: 1rem; margin-bottom: 14px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--dm-border); font-weight: 600; color: var(--dm-muted); font-size: 0.78rem; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--dm-border); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+.badge-super { background: #fdf6e8; color: var(--dm-accent); }
+.badge-admin { background: #ecf5f2; color: var(--dm-primary); }
+.badge-operator { background: #eef5fb; color: #5b9ecf; }
+.badge-active { background: #e8f5ee; color: var(--state-success); }
+.badge-inactive { background: #fdf0ed; color: var(--state-error); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; font-family: inherit; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: var(--dm-primary); color: #fff; }
+.btn-primary:hover { background: var(--dm-primary-dark); }
+.btn-outline { background: transparent; border: 1.5px solid var(--dm-border); color: var(--dm-text); }
+.btn-outline:hover { border-color: var(--dm-primary); color: var(--dm-primary); }
+.btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+.btn-danger { background: var(--state-error); color: #fff; }
+.btn-danger:hover { opacity: 0.85; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 5px; color: var(--dm-muted); }
+.form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--dm-border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; background: var(--dm-bg); }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: var(--dm-card); border-radius: 14px; padding: 28px; width: 90%; max-width: 420px; }
+.modal-box h3 { margin-bottom: 16px; }
+.toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: #fff; font-size: 0.85rem; z-index: 300; animation: slideIn 0.3s ease; }
+.toast.success { background: var(--state-success); }
+.toast.error { background: var(--state-error); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .topbar .menu-btn { display: block; }
+  .content { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><h2>斗门文化中心</h2><p style="color:rgba(255,255,255,0.4);font-size:0.7rem;margin-top:2px;">场地预约管理系统</p></div>
+    <div class="sidebar-nav">
+      <a href="/admin/dashboard">📊 工作台</a>
+      <a href="/admin/venues">🏛️ 场地管理</a>
+      <a href="/admin/bookings">📅 预约管理</a>
+      <a href="/admin/time-slots">⏰ 时间段设置</a>
+      <a href="/admin/notifications">🔔 通知管理</a>
+      <a href="/admin/users" class="active">👥 管理员管理</a>
+    </div>
+    <div class="sidebar-footer">
+      <div style="color:rgba(255,255,255,0.6);">👤 <span id="sidebarName">--</span></div>
+      <span class="logout-btn" onclick="logout()">退出登录</span>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <span class="page-title">管理员管理</span>
+      <button class="btn btn-primary btn-sm" onclick="showAddModal()">+ 新增管理员</button>
+    </div>
+    <div class="content">
+      <div class="card">
+        <div class="table-wrap">
+          <table><thead><tr><th>ID</th><th>账号</th><th>姓名</th><th>角色</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="adminList"><tr><td colspan="7" style="text-align:center;color:var(--dm-muted);">加载中...</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-box">
+    <h3>新增管理员</h3>
+    <div class="form-group"><label>账号</label><input id="aUsername" placeholder="登录账号"></div>
+    <div class="form-group"><label>密码</label><input id="aPassword" type="password" placeholder="至少6位"></div>
+    <div class="form-group"><label>姓名</label><input id="aName" placeholder="真实姓名"></div>
+    <div class="form-group"><label>角色</label><select id="aRole"><option value="admin">管理员</option><option value="operator">操作员</option></select></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="addAdmin()">创建</button>
+    </div>
+  </div>
+</div>
+<script>
+const API = '/api';
+const roleBadge = { super_admin: 'badge-super', admin: 'badge-admin', operator: 'badge-operator' };
+const roleText = { super_admin: '超级管理员', admin: '管理员', operator: '操作员' };
+
+function getToken() { return localStorage.getItem('admin_token'); }
+function getHeaders() {
+  const token = getToken();
+  if (!token) { window.location.href = '/admin/login'; return {}; }
+  return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/x-www-form-urlencoded' };
+}
+function logout() { localStorage.clear(); window.location.href = '/admin/login'; }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function toast(msg, type) { const t = document.createElement('div'); t.className = 'toast ' + (type||'success'); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+function showAddModal() { document.getElementById('addModal').classList.add('show'); }
+function closeModal() { document.getElementById('addModal').classList.remove('show'); ['aUsername','aPassword','aName'].forEach(i => document.getElementById(i).value = ''); }
+
+async function apiFetch(url, opts = {}) {
+  const h = getHeaders();
+  if (opts.body && typeof opts.body === 'object' && !(opts.body instanceof URLSearchParams)) {
+    const fd = new URLSearchParams();
+    for (const [k,v] of Object.entries(opts.body)) fd.append(k,v);
+    opts.body = fd;
+  }
+  const res = await fetch(API + url, { ...opts, headers: { ...h, ...(opts.headers||{}) } });
+  if (res.status === 401) { logout(); return; }
+  if (!res.ok) { const err = await res.json().catch(() => ({detail:'请求失败'})); throw new Error(err.detail || '请求失败'); }
+  return res.json();
+}
+
+async function loadAdmins() {
+  try {
+    const list = await apiFetch('/admin/users');
+    const tbody = document.getElementById('adminList');
+    tbody.innerHTML = list.map(a => `<tr>
+      <td>${a.id}</td><td>${a.username}</td><td>${a.name}</td>
+      <td><span class="badge ${roleBadge[a.role]||''}">${roleText[a.role]||a.role}</span></td>
+      <td><span class="badge ${a.is_active?'badge-active':'badge-inactive'}">${a.is_active?'正常':'已注销'}</span></td>
+      <td>${a.created_at?.slice(0,10)||'-'}</td>
+      <td>${a.role !== 'super_admin' ? `<button class="btn btn-danger btn-sm" onclick="deactivateAdmin(${a.id})">${a.is_active?'注销':'已注销'}</button>` : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--dm-muted);">暂无管理员</td></tr>';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function addAdmin() {
+  const username = document.getElementById('aUsername').value.trim();
+  const password = document.getElementById('aPassword').value.trim();
+  const name = document.getElementById('aName').value.trim();
+  const role = document.getElementById('aRole').value;
+  if (!username || !password || !name) { toast('请填写所有字段', 'error'); return; }
+  if (password.length < 6) { toast('密码至少6位', 'error'); return; }
+  try {
+    await apiFetch('/admin/users', { method: 'POST', body: { username, password, name, role } });
+    closeModal();
+    toast('创建成功');
+    loadAdmins();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function deactivateAdmin(id) {
+  if (!confirm('确定注销该管理员？')) return;
+  try {
+    await apiFetch('/admin/users/' + id + '/deactivate', { method: 'PUT' });
+    toast('已注销');
+    loadAdmins();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+(function init() {
+  if (!getToken()) { window.location.href = '/admin/login'; return; }
+  document.getElementById('sidebarName').textContent = localStorage.getItem('admin_name')||'--';
+  loadAdmins();
+})();
+</script>
+</body>
+</html>

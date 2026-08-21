@@ -1,0 +1,80 @@
+<!-- pages/profile/profile.wxml — 我的个人中心 -->
+<view class="page-container">
+  <!-- 未登录状态 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-prompt">
+    <view class="login-avatar-placeholder">
+      <text class="placeholder-icon">👤</text>
+    </view>
+    <text class="login-text">请先登录</text>
+    <text class="login-desc">登录后可预约场地和管理团队</text>
+    <view class="btn-login btn-primary" bindtap="onLogin">
+      <text>微信登录</text>
+    </view>
+  </view>
+
+  <!-- 已登录状态 -->
+  <view wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="user-card card">
+      <view class="user-info">
+        <view class="avatar-wrap">
+          <image
+            wx:if="{{userInfo.avatar}}"
+            class="avatar-img"
+            src="{{userInfo.avatar}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="avatar-placeholder">
+            <text>👤</text>
+          </view>
+        </view>
+        <view class="user-detail">
+          <text class="user-nickname">{{userInfo.nickname || '用户'}}</text>
+          <text class="user-phone" wx:if="{{userInfo.phone}}">{{userInfo.phone}}</text>
+          <view wx:else class="bind-phone-btn" bindtap="onGetPhoneNumber">
+            <text>绑定手机号</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 团队信息卡片 -->
+    <view wx:if="{{teamInfo}}" class="team-card card">
+      <view class="team-header">
+        <text class="team-label">我的团队</text>
+        <view class="team-role-badge">
+          <text>{{teamInfo.role === 'leader' ? '队长' : '成员'}}</text>
+        </view>
+      </view>
+      <text class="team-name">{{teamInfo.team_name}}</text>
+    </view>
+
+    <!-- 快捷操作 -->
+    <view class="actions-section">
+      <view class="section-title">快捷操作</view>
+      <view class="action-list">
+        <view class="action-item" bindtap="onGoToTeam">
+          <view class="action-left">
+            <text class="action-icon">👥</text>
+            <text class="action-text">我的团队</text>
+          </view>
+          <text class="action-arrow">›</text>
+        </view>
+        <view class="action-item" bindtap="onGoToBookings">
+          <view class="action-left">
+            <text class="action-icon">📅</text>
+            <text class="action-text">预约记录</text>
+          </view>
+          <text class="action-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-section">
+      <view class="btn-logout" bindtap="onLogout">
+        <text>退出登录</text>
+      </view>
+    </view>
+  </view>
+</view>
