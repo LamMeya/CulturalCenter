@@ -1,0 +1,26 @@
+name: zhuhai_art_center
+version: 1.0.0+1
+publish_to: 'none'
+
+description: 珠海艺术中心场地预约 Flutter 客户端
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2
+  dio: ^5.4.3
+  shared_preferences: ^2.2.3
+  intl: ^0.19.0
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

@@ -24,10 +24,9 @@
         </view>
         <text class="hero-icon">🏛</text>
       </view>
-      <view class="hero-overlay">
-        <view class="hero-tag" wx:if="{{venue.category}}">{{venue.category}}</view>
-        <text class="hero-name">{{venue.name}}</text>
-        <text class="hero-desc" wx:if="{{venue.description}}">{{venue.description}}</text>
+      <view class="hero-overlay" style="position: absolute; left: 0rpx; top: 0rpx">
+        <view class="hero-name">{{venue.name}}</view>
+        <text class="hero-desc" wx:if="{{venue.description}}" style="position: relative; left: 0rpx; top: -8rpx">{{venue.description}}</text>
       </view>
     </view>
 
@@ -44,10 +43,7 @@
         </view>
         <view class="info-item">
           <text class="info-label">开放状态</text>
-          <text class="info-value">
-            <text class="status-dot {{venue.status === 'open' ? 'dot-open' : 'dot-closed'}}"></text>
-            {{venue.status === 'open' ? '开放中' : '维护中'}}
-          </text>
+          <text class="info-value">{{venue.is_active ? '开放中' : '维护中'}}</text>
         </view>
       </view>
 
@@ -119,15 +115,15 @@
           </view>
           <view class="slot-grid">
             <view
-              class="slot-item {{selectedSlotIds.indexOf(item.id) >= 0 ? 'slot-selected' : ''}}"
+              class="slot-item {{item.selected ? 'slot-selected' : ''}}"
               wx:for="{{morningSlots}}"
               wx:key="id"
               data-slot="{{item}}"
               bindtap="onSlotTap"
             >
               <text class="slot-time">{{item.start_time}} - {{item.end_time}}</text>
-              <text class="slot-duration" wx:if="{{item.duration}}">{{item.duration}}分钟</text>
-              <view class="slot-check" wx:if="{{selectedSlotIds.indexOf(item.id) >= 0}}">✓</view>
+              <text class="slot-duration">{{item.duration ? item.duration + '分钟' : ''}}</text>
+              <view class="slot-check" wx:if="{{item.selected}}">✓</view>
             </view>
           </view>
         </view>
@@ -140,15 +136,15 @@
           </view>
           <view class="slot-grid">
             <view
-              class="slot-item {{selectedSlotIds.indexOf(item.id) >= 0 ? 'slot-selected' : ''}}"
+              class="slot-item {{item.selected ? 'slot-selected' : ''}}"
               wx:for="{{afternoonSlots}}"
               wx:key="id"
               data-slot="{{item}}"
               bindtap="onSlotTap"
             >
               <text class="slot-time">{{item.start_time}} - {{item.end_time}}</text>
-              <text class="slot-duration" wx:if="{{item.duration}}">{{item.duration}}分钟</text>
-              <view class="slot-check" wx:if="{{selectedSlotIds.indexOf(item.id) >= 0}}">✓</view>
+              <text class="slot-duration">{{item.duration ? item.duration + '分钟' : ''}}</text>
+              <view class="slot-check" wx:if="{{item.selected}}">✓</view>
             </view>
           </view>
         </view>
@@ -164,9 +160,7 @@
     <view class="bottom-left">
       <text class="bottom-count">已选 <text class="count-num">{{selectedSlots.length}}</text>/{{maxSlots}} 个时段</text>
       <view class="selected-summary" wx:if="{{selectedSlots.length > 0}}">
-        <text class="summary-item" wx:for="{{selectedSlots}}" wx:key="id" wx:for-item="s">
-          {{s.start_time}}-{{s.end_time}}
-        </text>
+        <view class="summary-item" wx:for="{{selectedSlots}}" wx:key="id" wx:for-item="s">{{s.start_time}}-{{s.end_time}}</view>
       </view>
     </view>
     <view
@@ -194,9 +188,9 @@
         <view class="modal-row">
           <text class="modal-label">时段</text>
           <view class="modal-value">
-            <text class="modal-slot" wx:for="{{selectedSlots}}" wx:key="id" wx:for-item="s">
+            <view class="modal-slot" wx:for="{{selectedSlots}}" wx:key="id" wx:for-item="s">
               {{s.start_time}} - {{s.end_time}}
-            </text>
+            </view>
           </view>
         </view>
         <view class="modal-row">
@@ -222,10 +216,6 @@
       <text class="success-desc">您的场馆预约已提交，请等待审核</text>
 
       <view class="success-info" wx:if="{{bookingResult}}">
-        <view class="si-row">
-          <text class="si-label">预约编号</text>
-          <text class="si-value">{{bookingResult.id || bookingResult.booking_id}}</text>
-        </view>
         <view class="si-row" wx:if="{{bookingResult.status}}">
           <text class="si-label">状态</text>
           <text class="si-value status-pending">待审核</text>

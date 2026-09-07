@@ -44,6 +44,28 @@ def require_role(*roles: AdminRole):
     return checker
 
 
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """App 用户端：从 Bearer token 解析当前用户"""
+    from app.database import SessionLocal
+    from app.models import User
+    try:
+        payload = jwt.decode(credentials.credentials, settings.SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="无效的令牌")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="无效的令牌")
+
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter_by(id=int(user_id)).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="用户不存在")
+        return user
+    finally:
+        db.close()
+
+
 @router.post("/login")
 async def admin_login(username: str = Form(...), password: str = Form(...)):
     """管理员登录 - 接收 x-www-form-urlencoded 表单数据"""

@@ -9,7 +9,7 @@
       <view class="wave-layer wave-3"></view>
     </view>
     <view class="brand-content">
-      <text class="brand-name">斗门文化中心</text>
+      <text class="brand-name">文化中心</text>
       <text class="brand-subtitle">渔乡文艺 · 文化传承</text>
     </view>
   </view>
@@ -17,7 +17,7 @@
   <!-- 通知横幅 — 横向滚动 -->
   <view class="notification-bar" wx:if="{{notifications.length > 0}}">
     <view class="notification-icon">
-      <text class="icon-bell">&#x1F514;</text>
+      <text class="icon-bell">🔔</text>
     </view>
     <swiper
       class="notification-swiper"
@@ -34,7 +34,8 @@
           data-notification="{{item}}"
           bindtap="onNotificationTap"
         >
-          <text class="notification-text">{{item.title}}</text>
+          <text class="notification-title">{{item.title}}</text>
+          <text class="notification-content">{{item.content}}</text>
         </view>
       </swiper-item>
     </swiper>
@@ -88,9 +89,7 @@
         <view class="venue-info">
           <view class="venue-name-row">
             <text class="venue-name">{{item.name}}</text>
-            <text class="venue-status {{item.status === 'open' ? 'status-open' : 'status-closed'}}">
-              {{item.status === 'open' ? '开放中' : '维护中'}}
-            </text>
+            <view class="venue-status {{item.is_active ? 'status-open' : 'status-closed'}}">{{item.is_active ? '开放中' : '维护中'}}</view>
           </view>
 
           <view class="venue-meta">
@@ -102,20 +101,11 @@
               <text class="meta-icon">📐</text>
               <text class="meta-text">{{item.area || '--'}} m²</text>
             </view>
-            <view class="meta-item">
+          </view>
+          <view class="meta-item">
               <text class="meta-icon">📍</text>
-              <text class="meta-text meta-address">{{item.address || '斗门文化中心'}}</text>
+              <text class="meta-text meta-address">{{item.address || '文化中心'}}</text>
             </view>
-          </view>
-
-          <view class="venue-footer">
-            <view class="facility-tags" wx:if="{{item.facilities && item.facilities.length > 0}}">
-              <text class="facility-tag" wx:for="{{item.facilities}}" wx:key="*this" wx:for-item="facility">
-                {{facility}}
-              </text>
-            </view>
-            <view class="venue-arrow">⟩</view>
-          </view>
         </view>
       </view>
     </view>

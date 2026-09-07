@@ -1,11 +1,14 @@
 /* pages/index/index.wxss — 首页 渔乡文艺风 */
 
+page { background-color: #ffffff; padding: 0; margin: 0; }
+.page-index { padding-top: 0; margin-top: 0; }
 /* ========== 顶部品牌区 ========== */
 .brand-hero {
+  margin-top: 0;
   position: relative;
   height: 320rpx;
   overflow: hidden;
-  background: linear-gradient(180deg, #2e6e5e 0%, #3d8e7a 40%, #5baa96 70%, #7cc4b2 100%);
+  background: linear-gradient(180deg, #3d8e7a 0%, #3d8e7a 20%, #5baa96 70%, #7cc4b2 100%);
 }
 
 .brand-wave {
@@ -96,38 +99,51 @@
 /* ========== 通知横幅 ========== */
 .notification-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin: 16rpx 24rpx;
   padding: 16rpx 20rpx;
   background: linear-gradient(135deg, #fdf6e8, #fef0d0);
   border-left: 6rpx solid var(--dm-accent);
   border-radius: var(--dm-radius-sm);
-  height: 56rpx;
+  min-height: 56rpx;
 }
 
 .notification-icon {
   margin-right: 12rpx;
+  margin-top: 4rpx;
   font-size: 28rpx;
   flex-shrink: 0;
 }
 
 .notification-swiper {
   flex: 1;
-  height: 40rpx;
+  height: 80rpx;
 }
 
 .notification-item {
   display: flex;
-  align-items: center;
-  height: 40rpx;
+  flex-direction: column;
+  justify-content: center;
+  /* height: 80rpx; */
+  overflow: hidden;
 }
 
-.notification-text {
-  font-size: 26rpx;
+.notification-title {
+  font-size: 28rpx;
+  font-weight: 600;
   color: #8a6d20;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.notification-content {
+  font-size: 22rpx;
+  color: #b8952e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2rpx;
 }
 
 .notification-arrow {
@@ -229,16 +245,23 @@
   display: flex;
   flex-wrap: wrap;
   padding: 0 24rpx;
-  gap: 16rpx;
+  justify-content: space-between;
+}
+
+.venue-list::after {
+  content: '';
+  flex: 0 0 calc((100% - 16rpx) / 2);
 }
 
 .venue-card {
-  width: calc(50% - 8rpx);
+  width: calc((100% - 16rpx) / 2);
   background: var(--dm-card);
   border-radius: var(--dm-radius);
   overflow: hidden;
   box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.05);
   transition: transform 0.2s;
+  margin-bottom: 16rpx;
+  box-sizing: border-box;
 }
 
 .venue-card:active {
@@ -298,7 +321,7 @@
 
 /* 信息区域 — 无水平内边距，与图片左右对齐 */
 .venue-info {
-  padding: 16rpx 0;
+  padding: 16rpx;
 }
 
 .venue-name-row {
@@ -321,10 +344,15 @@
 
 .venue-status {
   font-size: 20rpx;
-  padding: 2rpx 10rpx;
-  border-radius: 20rpx;
+  height: 36rpx;
+  padding: 0 12rpx;
+  border-radius: 6rpx;
   margin-left: 8rpx;
   flex-shrink: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .status-open {

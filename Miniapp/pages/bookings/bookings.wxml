@@ -40,20 +40,20 @@
 
       <view class="booking-info">
         <view class="info-row">
-          <text class="info-label">日期</text>
-          <text class="info-value">{{item.date}}</text>
+          <text class="info-label">预约日期</text>
+          <text class="info-value">{{item.bookingDate}}</text>
         </view>
         <view class="info-row">
-          <text class="info-label">时间</text>
-          <text class="info-value">{{item.time_slot_start}} - {{item.time_slot_end}}</text>
+          <text class="info-label">预约时间</text>
+          <text class="info-value">{{item.bookingStart}} - {{item.bookingEnd}}</text>
         </view>
-        <view class="info-row" wx:if="{{item.team_name}}">
-          <text class="info-label">团队</text>
-          <text class="info-value">{{item.team_name}}</text>
+        <view class="info-row">
+          <text class="info-label">预约人</text>
+          <text class="info-value">{{item.bookerName}}</text>
         </view>
       </view>
 
-      <view wx:if="{{item.status === 'pending' || item.status === 'won'}}" class="booking-actions">
+      <view wx:if="{{item.canCancel}}" class="booking-actions">
         <view
           class="btn-cancel"
           data-id="{{item.id}}"

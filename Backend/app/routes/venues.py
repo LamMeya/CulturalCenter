@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+import json
 from app.database import get_db
 from app.models import Venue, TimeSlot, Booking
 from app.routes.auth import get_current_admin
@@ -10,13 +11,30 @@ router = APIRouter()
 UPLOAD_DIR = "app/static/uploads/venues"
 
 
+def _parse_facilities(facilities):
+    if not facilities:
+        return []
+    if isinstance(facilities, list):
+        return facilities
+    if isinstance(facilities, str):
+        try:
+            parsed = json.loads(facilities)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, TypeError):
+            pass
+        return [f.strip() for f in facilities.split(',') if f.strip()]
+    return []
+
+
+
 @router.get("")
 async def list_venues(db: Session = Depends(get_db)):
     venues = db.query(Venue).filter_by(is_active=True).order_by(Venue.created_at.desc()).all()
     return [{
         "id": v.id, "name": v.name, "image_url": v.image_url,
         "description": v.description, "capacity": v.capacity,
-        "area": v.area, "facilities": v.facilities,
+        "area": v.area, "facilities": _parse_facilities(v.facilities),
         "address": v.address, "is_active": v.is_active
     } for v in venues]
 
@@ -30,7 +48,7 @@ async def get_venue(venue_id: int, db: Session = Depends(get_db)):
         "id": venue.id, "name": venue.name, "image_url": venue.image_url,
         "description": venue.description, "capacity": venue.capacity,
         "area": venue.area, "facilities": venue.facilities,
-        "address": venue.address
+        "address": venue.address, "is_active": venue.is_active, "facilities": _parse_facilities(venue.facilities)
     }
 
 

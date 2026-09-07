@@ -176,6 +176,15 @@
   <script>
     const API = '/api';
 
+    function unwrap(body) {
+      // 后端统一响应：{ code, message, data }
+      if (body && typeof body === 'object' && 'code' in body && 'data' in body) {
+        if (body.code === 0) return body.data;
+        throw new Error(body.message || '请求失败');
+      }
+      return body; // 非包装结构（理论上不应出现）
+    }
+
     async function handleLogin(e) {
       e.preventDefault();
       const btn = document.getElementById('loginBtn');
@@ -199,12 +208,15 @@
           body: formData
         });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || '登录失败');
+        let data = await res.json();
+        if (!res.ok) throw new Error(data.detail || data.message || '登录失败');
+
+        // 统一解包：新结构 data = { token, admin }
+        data = unwrap(data);
 
         localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_name', data.admin.name);
-        localStorage.setItem('admin_role', data.admin.role);
+        localStorage.setItem('admin_name', data.admin ? data.admin.name : (data.name || username));
+        localStorage.setItem('admin_role', data.admin ? data.admin.role : (data.role || 'operator'));
         window.location.href = '/admin/dashboard';
       } catch (err) {
         errorEl.textContent = err.message;

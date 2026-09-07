@@ -1,9 +1,0 @@
-DATABASE_URL=mysql+pymysql://root:password@localhost:3306/doumen_culture
-SECRET_KEY=your-secret-key-change-in-production
-WECHAT_APPID=wx_your_appid
-WECHAT_SECRET=your_wechat_app_secret
-WECHAT_IOS_APPID=wx_ios_appid
-WECHAT_IOS_SECRET=ios_app_secret
-ADMIN_INIT_USERNAME=superadmin
-ADMIN_INIT_PASSWORD=SuperAdmin@2026
-ENVIRONMENT=development

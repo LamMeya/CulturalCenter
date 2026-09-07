@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- base-config 全局允许明文，已经覆盖所有 IP/主机名；domain-config 用来确保兼容性
+         注意：同一个 domain 绝对不能出现两次，否则 Android 解析时直接抛异常崩溃 -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">10.0.2.15</domain>
+        <domain includeSubdomains="true">10.0.2.16</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <!-- 开发者常用局域网网段，IP 变动时兜底可用 192.168.x.x -->
+        <domain includeSubdomains="false">192.168.0.109</domain>
+    </domain-config>
+</network-security-config>

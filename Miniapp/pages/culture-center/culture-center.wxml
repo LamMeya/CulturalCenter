@@ -50,8 +50,8 @@
         <path d="M610,85 Q620,80 630,85" fill="none" stroke="#8c7b6a" stroke-width="1.5" opacity="0.3"/>
       </svg>
     </view>
-    <view class="hero-overlay">
-      <text class="hero-title">斗门文化中心</text>
+    <view class="">
+      <text class="hero-title">文化中心</text>
       <text class="hero-subtitle">渔乡文艺 · 文化传承</text>
     </view>
   </view>
@@ -64,7 +64,7 @@
     </view>
     <view class="card">
       <text class="section-text">
-        斗门文化中心坐落于珠海市斗门区，是一座集文化展示、文艺演出、艺术培训、场地租赁于一体的综合性文化场馆。中心秉承"传承渔乡文化，丰富群众生活"的宗旨，为本地居民和文艺团体提供优质的公共文化服务。
+        文化中心坐落于珠海市区，是一座集文化展示、文艺演出、艺术培训、场地租赁于一体的综合性文化场馆。中心秉承"传承渔乡文化，丰富群众生活"的宗旨，为本地居民和文艺团体提供优质的公共文化服务。
       </text>
       <text class="section-text">
         场馆内设有多功能厅、排练厅、展览厅、书画室、音乐室等多个功能区域，配备先进的灯光音响设备，可满足各类文艺活动和文化交流需求。

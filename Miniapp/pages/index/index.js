@@ -1,5 +1,13 @@
 // pages/index/index.js — 首页
-const app = getApp();
+const api = require('../../utils/api');
+// 安全获取 App 实例，未就绪时返回空壳 globalData，避免 getApp() 返回 undefined 导致崩溃
+let _appInstance = null;
+function getAppInstance() {
+  if (!_appInstance) {
+    try { _appInstance = getApp(); } catch (e) { _appInstance = null; }
+  }
+  return _appInstance || { globalData: {} };
+}
 
 Page({
   data: {
@@ -41,60 +49,38 @@ Page({
   },
 
   // ========== 获取场馆列表 ==========
-  fetchVenues() {
-    const apiBase = app.globalData.apiBase;
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: `${apiBase}/venues`,
-        method: 'GET',
-        success: (res) => {
-          if (res.statusCode === 200 && res.data) {
-            const venues = Array.isArray(res.data) ? res.data : (res.data.venues || res.data.data || []);
-            this.setData({
-              venues,
-              loading: false,
-              errorMsg: ''
-            });
-            resolve(venues);
-          } else {
-            this.setData({ loading: false, errorMsg: '获取场馆列表失败' });
-            reject(res);
-          }
-        },
-        fail: (err) => {
-          console.error('获取场馆列表失败:', err);
-          this.setData({ loading: false, errorMsg: '网络异常，请下拉刷新重试' });
-          reject(err);
-        }
+  // api.get 返回 data（已经解包成 venues 数组）
+  async fetchVenues() {
+    try {
+      const venues = await api.get('/venues') || [];
+      this.setData({
+        venues: Array.isArray(venues) ? venues : [],
+        loading: false,
+        errorMsg: ''
       });
-    });
+      return venues;
+    } catch (err) {
+      console.error('获取场馆列表失败:', err);
+      this.setData({ loading: false, errorMsg: '获取场馆列表失败' });
+      throw err;
+    }
   },
 
   // ========== 获取活跃通知 ==========
-  fetchNotifications() {
-    const apiBase = app.globalData.apiBase;
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: `${apiBase}/notifications/active`,
-        method: 'GET',
-        success: (res) => {
-          if (res.statusCode === 200 && res.data) {
-            const notifications = Array.isArray(res.data) ? res.data : (res.data.notifications || res.data.data || []);
-            this.setData({ notifications });
-            if (notifications.length > 1) {
-              this.startNotificationScroll();
-            }
-            resolve(notifications);
-          } else {
-            resolve([]);
-          }
-        },
-        fail: (err) => {
-          console.error('获取通知失败:', err);
-          resolve([]);
-        }
-      });
-    });
+  async fetchNotifications() {
+    try {
+      const res = await api.get('/notifications/published');
+      // 取数组；虽然 publish 路径在有些版本会返回 data=[{通知}]，但 utils/api 会帮我们解包 data
+      const notifications = Array.isArray(res) ? res : (res && res.data) || [];
+      this.setData({ notifications });
+      if (notifications.length > 1) {
+        this.startNotificationScroll();
+      }
+      return notifications;
+    } catch (err) {
+      console.error('获取通知失败:', err);
+      return [];
+    }
   },
 
   // ========== 通知横幅滚动 ==========
@@ -137,8 +123,7 @@ Page({
   // ========== 跳转通知详情 ==========
   onNotificationTap(e) {
     const notification = e.currentTarget.dataset.notification;
-    if (notification.link_url) {
-      // 可跳转外部链接或内部页面
+    if (notification && notification.link_url) {
       wx.showToast({ title: notification.title || '通知详情', icon: 'none' });
     }
   }

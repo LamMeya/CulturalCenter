@@ -1,5 +1,13 @@
 // pages/venue-detail/venue-detail.js — 场馆详情与预约
-const app = getApp();
+const api = require('../../utils/api');
+// 安全获取 App 实例，未就绪时返回空壳 globalData，避免 getApp() 返回 undefined 导致崩溃
+let _appInstance = null;
+function getAppInstance() {
+  if (!_appInstance) {
+    try { _appInstance = getApp(); } catch (e) { _appInstance = null; }
+  }
+  return _appInstance || { globalData: {} };
+}
 
 Page({
   data: {
@@ -20,6 +28,9 @@ Page({
     selectedSlotIds: [],    // 存储选中的 slot id
     maxSlots: 4,
 
+    // 导航栏高度
+    navBarHeight: 0,
+
     // 确认弹窗
     showConfirmModal: false,
     bookingResult: null,
@@ -38,41 +49,28 @@ Page({
       wx.navigateBack();
       return;
     }
-    this.setData({ venueId });
+    const sysInfo = wx.getSystemInfoSync();
+    const rpxRatio = 750 / sysInfo.windowWidth;
+    const navBarHeight = Math.round((sysInfo.statusBarHeight + 44) * rpxRatio);
+    this.setData({ venueId, navBarHeight });
     this.fetchVenueDetail();
     this.generateDateList();
     this.checkUserTeam();
   },
 
-  // ========== 获取场馆详情 ==========
-  fetchVenueDetail() {
+  // ========== 获取场馆详情：api.get 已解包返回 venue ==========
+  async fetchVenueDetail() {
     const { venueId } = this.data;
-    const apiBase = app.globalData.apiBase;
     this.setData({ loading: true });
-
-    wx.request({
-      url: `${apiBase}/venues/${venueId}`,
-      method: 'GET',
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          const venue = res.data.venue || res.data;
-          this.setData({
-            venue,
-            loading: false
-          });
-          // 获取场馆后，默认选中第一个可用日期
-          this.autoSelectDate();
-        } else {
-          this.setData({ loading: false });
-          wx.showToast({ title: '获取场馆信息失败', icon: 'none' });
-        }
-      },
-      fail: (err) => {
-        console.error('获取场馆详情失败:', err);
-        this.setData({ loading: false });
-        wx.showToast({ title: '网络异常', icon: 'none' });
-      }
-    });
+    try {
+      const venue = await api.get(`/venues/${venueId}`);
+      this.setData({ venue, loading: false });
+      this.autoSelectDate();
+    } catch (err) {
+      console.error('获取场馆详情失败:', err);
+      this.setData({ loading: false });
+      wx.showToast({ title: '获取场馆信息失败', icon: 'none' });
+    }
   },
 
   // ========== 生成日期列表（未来14天，排除周一） ==========
@@ -80,34 +78,27 @@ Page({
     const dateList = [];
     const today = new Date();
     const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-
     for (let i = 0; i < 14; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       const dayOfWeek = date.getDay();
-
-      // 排除周一 (dayOfWeek === 1)
-      if (dayOfWeek === 1) continue;
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const dateStr = `${year}-${month}-${day}`;
-
+      if (dayOfWeek === 1) continue; // 周一闭馆
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${y}-${m}-${d}`;
       dateList.push({
         date: dateStr,
         dayName: dayNames[dayOfWeek],
         day: String(date.getDate()),
-        monthDay: `${month}/${day}`,
-        hasSlots: null,       // null = 未检查, true/false 检查后
-        available: true       // 默认可用
+        monthDay: `${m}/${d}`,
+        hasSlots: null,
+        available: true
       });
     }
-
     this.setData({ dateList });
   },
 
-  // ========== 自动选中第一个可用日期 ==========
   autoSelectDate() {
     const { dateList } = this.data;
     if (dateList.length > 0) {
@@ -115,7 +106,6 @@ Page({
     }
   },
 
-  // ========== 选择日期 ==========
   selectDate(e) {
     const date = e.currentTarget.dataset.date;
     this.setData({
@@ -129,53 +119,34 @@ Page({
     this.fetchTimeSlots(date);
   },
 
-  // ========== 获取时间段 ==========
-  fetchTimeSlots(date) {
+  // ========== 获取时间段：api.get 解包返回 slots 数组 ==========
+  async fetchTimeSlots(date) {
     const { venueId } = this.data;
-    const apiBase = app.globalData.apiBase;
     this.setData({ dateLoading: true });
-
-    wx.request({
-      url: `${apiBase}/venues/${venueId}/time-slots`,
-      method: 'GET',
-      data: { date },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          const slots = Array.isArray(res.data) ? res.data : (res.data.slots || res.data.time_slots || []);
-
-          // 按上下午分组
-          const morningSlots = slots.filter(s => {
-            const hour = parseInt(s.start_time || '00');
-            return hour < 12;
-          });
-          const afternoonSlots = slots.filter(s => {
-            const hour = parseInt(s.start_time || '00');
-            return hour >= 12;
-          });
-
-          this.setData({
-            timeSlots: slots,
-            morningSlots,
-            afternoonSlots,
-            dateLoading: false
-          });
-
-          // 更新日期列表中的可用状态
-          this.updateDateAvailability(date, slots.length > 0);
-        } else {
-          this.setData({ dateLoading: false });
-          this.updateDateAvailability(date, false);
-        }
-      },
-      fail: (err) => {
-        console.error('获取时间段失败:', err);
-        this.setData({ dateLoading: false });
-        this.updateDateAvailability(date, false);
-      }
-    });
+    try {
+      const slotsRaw = await api.get(`/venues/${venueId}/time-slots`, { date }) || [];
+      const slots = slotsRaw.map(s => ({
+        ...s,
+        start_time: this.formatTime(s.start_time),
+        end_time: this.formatTime(s.end_time),
+        selected: false
+      }));
+      const morningSlots = slots.filter(s => (parseInt(s.start_time || '00')) < 12);
+      const afternoonSlots = slots.filter(s => (parseInt(s.start_time || '00')) >= 12);
+      this.setData({
+        timeSlots: slots,
+        morningSlots,
+        afternoonSlots,
+        dateLoading: false
+      });
+      this.updateDateAvailability(date, slots.length > 0);
+    } catch (err) {
+      console.error('获取时间段失败:', err);
+      this.setData({ dateLoading: false });
+      this.updateDateAvailability(date, false);
+    }
   },
 
-  // ========== 更新日期可用性 ==========
   updateDateAvailability(date, hasSlots) {
     const dateList = this.data.dateList.map(item => {
       if (item.date === date) {
@@ -189,171 +160,121 @@ Page({
   // ========== 选择/取消时间段（多选，最多4个） ==========
   onSlotTap(e) {
     const slot = e.currentTarget.dataset.slot;
-    const { selectedSlots, selectedSlotIds, maxSlots } = this.data;
-
+    const { selectedSlots, selectedSlotIds, maxSlots, morningSlots, afternoonSlots, timeSlots } = this.data;
     const slotId = slot.id;
-    const index = selectedSlotIds.indexOf(slotId);
-
-    if (index >= 0) {
-      // 取消选择
-      selectedSlots.splice(index, 1);
-      selectedSlotIds.splice(index, 1);
-      this.setData({ selectedSlots, selectedSlotIds });
+    const idx = selectedSlotIds.indexOf(slotId);
+    if (idx >= 0) {
+      selectedSlots.splice(idx, 1);
+      selectedSlotIds.splice(idx, 1);
+      const upd = (arr) => { for (let i = 0; i < arr.length; i++) if (arr[i].id === slotId) arr[i].selected = false; };
+      upd(morningSlots); upd(afternoonSlots); upd(timeSlots);
     } else {
-      // 选择
       if (selectedSlotIds.length >= maxSlots) {
         wx.showToast({ title: `最多选择 ${maxSlots} 个时段`, icon: 'none' });
         return;
       }
       selectedSlots.push(slot);
       selectedSlotIds.push(slotId);
-      this.setData({ selectedSlots, selectedSlotIds });
+      const upd = (arr) => { for (let i = 0; i < arr.length; i++) if (arr[i].id === slotId) arr[i].selected = true; };
+      upd(morningSlots); upd(afternoonSlots); upd(timeSlots);
     }
+    this.setData({ selectedSlots, selectedSlotIds, morningSlots, afternoonSlots, timeSlots });
   },
 
-  // ========== 检查用户是否有团队 ==========
-  checkUserTeam() {
-    const apiBase = app.globalData.apiBase;
-    const userId = app.globalData.userId;
-
+  // ========== 检查用户是否有团队：api.get 解包 teams 数组 ==========
+  async checkUserTeam() {
+    const userId = getAppInstance().globalData.userId;
     if (!userId) {
       this.setData({ teamChecked: true });
       return;
     }
-
-    wx.request({
-      url: `${apiBase}/teams`,
-      method: 'GET',
-      data: { user_id: userId },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          const teams = Array.isArray(res.data) ? res.data : (res.data.teams || []);
-          const userTeam = teams.length > 0 ? teams[0] : null;
-          this.setData({ userTeam, teamChecked: true });
-        } else {
-          this.setData({ teamChecked: true });
-        }
-      },
-      fail: () => {
-        this.setData({ teamChecked: true });
-      }
-    });
+    try {
+      const teams = await api.get('/teams', userId ? { user_id: userId } : {}) || [];
+      const arr = Array.isArray(teams) ? teams : [];
+      this.setData({ userTeam: arr[0] || null, teamChecked: true });
+    } catch (err) {
+      console.warn('获取团队失败:', err);
+      this.setData({ teamChecked: true });
+    }
   },
 
-  // ========== 点击确认预约（先检查登录，再检查团队） ==========
+  // ========== 点击确认预约 ==========
   onConfirmBooking() {
     const { selectedSlots, userTeam, teamChecked } = this.data;
-
-    // 检查是否已选时段
     if (selectedSlots.length === 0) {
       wx.showToast({ title: '请先选择预约时段', icon: 'none' });
       return;
     }
-
-    // 第一步：检查登录状态
-    app.checkLogin().then(() => {
-      // 已登录，继续检查团队状态
-      if (!teamChecked) {
-        wx.showToast({ title: '正在检查团队信息...', icon: 'none' });
-        return;
-      }
-
+    getAppInstance().checkLogin().then(() => {
+      if (!teamChecked) { wx.showToast({ title: '正在检查团队信息...', icon: 'none' }); return; }
       if (!userTeam) {
         wx.showModal({
           title: '提示',
           content: '您还没有加入团队，需要先创建或加入一个团队才能预约场馆。',
           confirmText: '去创建团队',
           cancelText: '稍后',
-          success: (res) => {
-            if (res.confirm) {
-              wx.switchTab({
-                url: '/pages/team/team'
-              });
-            }
-          }
+          success: (res) => { if (res.confirm) wx.switchTab({ url: '/pages/team/team' }); }
         });
         return;
       }
-
-      // 显示确认弹窗
       this.setData({ showConfirmModal: true });
-    }).catch(() => {
-      // 用户取消登录，不做任何操作
-    });
+    }).catch(() => {});
   },
 
-  // ========== 关闭确认弹窗 ==========
   onCloseConfirmModal() {
     this.setData({ showConfirmModal: false });
   },
 
-  // ========== 提交预约 ==========
-  onSubmitBooking() {
-    const { venueId, selectedSlots, selectedSlotIds, userTeam } = this.data;
-    const apiBase = app.globalData.apiBase;
-    const userId = app.globalData.userId;
-
-    if (!userId) {
-      wx.showToast({ title: '请先登录', icon: 'none' });
-      return;
-    }
-
+  // ========== 提交预约：api.post 解包返回 booking ==========
+  async onSubmitBooking() {
+    const { venueId, selectedSlotIds, userTeam } = this.data;
+    const userId = getAppInstance().globalData.userId;
+    if (!userId) { wx.showToast({ title: '请先登录', icon: 'none' }); return; }
     if (this.data.submitting) return;
     this.setData({ submitting: true });
 
-    wx.request({
-      url: `${apiBase}/bookings`,
-      method: 'POST',
-      data: {
+    try {
+      const booking = await api.post('/bookings', {
         user_id: userId,
         team_id: userTeam.id,
         venue_id: parseInt(venueId),
         time_slot_ids: selectedSlotIds
-      },
-      success: (res) => {
-        this.setData({ submitting: false });
-        if (res.statusCode === 200 || res.statusCode === 201) {
-          const booking = res.data.booking || res.data;
-          this.setData({
-            bookingResult: booking,
-            showConfirmModal: false,
-            showSuccessModal: true,
-            selectedSlots: [],
-            selectedSlotIds: []
-          });
-        } else {
-          const msg = (res.data && res.data.message) || '预约失败，请重试';
-          wx.showToast({ title: msg, icon: 'none' });
-        }
-      },
-      fail: (err) => {
-        console.error('预约失败:', err);
-        this.setData({ submitting: false });
-        wx.showToast({ title: '网络异常，请重试', icon: 'none' });
-      }
-    });
+      });
+      this.setData({
+        submitting: false,
+        bookingResult: booking,
+        showConfirmModal: false,
+        showSuccessModal: true,
+        selectedSlots: [],
+        selectedSlotIds: []
+      });
+    } catch (err) {
+      console.error('预约失败:', err);
+      this.setData({ submitting: false });
+      wx.showToast({ title: (err && (err.message || err.detail)) || '预约失败，请重试', icon: 'none' });
+    }
   },
 
-  // ========== 关闭成功弹窗 ==========
   onCloseSuccessModal() {
     this.setData({ showSuccessModal: false });
     wx.navigateBack();
   },
 
-  // ========== 查看我的预约 ==========
   onViewBookings() {
     this.setData({ showSuccessModal: false });
-    wx.switchTab({
-      url: '/pages/bookings/bookings'
-    });
+    wx.switchTab({ url: '/pages/bookings/bookings' });
   },
 
-  // ========== 格式化时间显示 ==========
-  formatTimeRange(startTime, endTime) {
-    return `${startTime} - ${endTime}`;
+  formatTime(timeStr) {
+    if (!timeStr) return '';
+    const match = String(timeStr).match(/^(\d{2}:\d{2})/);
+    return match ? match[1] : timeStr;
   },
 
-  // ========== 判断时段是否被选中 ==========
+  formatTimeRange(s, e) {
+    return `${this.formatTime(s)} - ${this.formatTime(e)}`;
+  },
+
   isSlotSelected(slotId) {
     return this.data.selectedSlotIds.indexOf(slotId) >= 0;
   },
@@ -361,7 +282,7 @@ Page({
   onShareAppMessage() {
     const { venue } = this.data;
     return {
-      title: venue ? `${venue.name} - 斗门文化中心` : '斗门文化中心场馆预约',
+      title: venue ? `${venue.name} - 文化中心` : '文化中心场馆预约',
       path: `/pages/venue-detail/venue-detail?venue_id=${this.data.venueId}`
     };
   }

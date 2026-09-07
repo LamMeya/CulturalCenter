@@ -7,6 +7,15 @@ build/
 .venv/
 venv/
 
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# WeChat certificates
+wx*_development
+wx*_production
+
 # IDE
 .idea/
 .vscode/
@@ -19,3 +28,16 @@ Thumbs.db
 
 # env
 .env
+
+# Android
+Android/.gradle/
+Android/.kotlin/
+Android/app/build/
+Android/build/
+Android/local.properties
+
+# Flutter build (Flutter/ has its own .gitignore, but add here as safety)
+Flutter/build/
+Flutter/.dart_tool/
+Flutter/.flutter-plugins-dependencies
+

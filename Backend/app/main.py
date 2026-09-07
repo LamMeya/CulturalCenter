@@ -6,6 +6,7 @@ from app.database import engine, Base
 from app.routes import auth, admin, venues, bookings, teams, users, notifications, system
 from app.routes import admin_ui
 from app.services.init_service import init_super_admin, init_test_user
+from app.middleware import UnifiedResponseMiddleware
 
 app = FastAPI(title="斗门文化中心场地预约系统", version="1.0.0")
 
@@ -16,6 +17,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 统一响应格式：/api/* 的 2xx JSON 返回自动包一层 { code:0, message:"ok", data }
+# —— 管理后台 HTML / /api/health / OpenAPI / 静态资源 会被白名单跳过，不被包裹
+app.add_middleware(UnifiedResponseMiddleware)
 
 # 用绝对路径，避免 uvicorn --reload 子进程 cwd 变化导致找不到
 _static_dir = str(Path(__file__).resolve().parent / "static")

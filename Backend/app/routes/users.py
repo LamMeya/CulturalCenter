@@ -3,7 +3,7 @@ from app.database import get_db
 from app.models import User, Team, TeamMember, Booking, BookingStatus, CancelRecord
 from app.services.init_service import verify_password, hash_password
 from app.services.wechat_service import wechat_code_to_session, wechat_ios_token
-from app.routes.auth import get_current_admin
+from app.routes.auth import get_current_admin, create_token, get_current_user
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
@@ -43,6 +43,11 @@ class PasswordRegisterRequest(BaseModel):
     phone: str = ""
 
 
+# App 端通用返回包装（匹配 Android 端 ApiResponse<LoginResponse>：{ code, message, data }）
+def _ok(data) -> dict:
+    return {"code": 0, "message": "ok", "data": data}
+
+
 @router.post("/login/password")
 async def password_login(req: PasswordLoginRequest, db: Session = Depends(get_db)):
     """账号密码登录"""
@@ -53,9 +58,10 @@ async def password_login(req: PasswordLoginRequest, db: Session = Depends(get_db
         raise HTTPException(status_code=401, detail="账号或密码错误")
 
     team_info = _get_user_team_info(user.id, db)
+    token = create_token({"sub": str(user.id), "role": "user"})
 
-    return {
-        "token": "password_token_placeholder",
+    return _ok({
+        "token": token,
         "user": {
             "id": user.id,
             "nickname": user.nickname,
@@ -63,7 +69,7 @@ async def password_login(req: PasswordLoginRequest, db: Session = Depends(get_db
             "avatar_url": user.avatar_url,
             **team_info
         }
-    }
+    })
 
 
 @router.post("/register")
@@ -85,8 +91,10 @@ async def register(req: PasswordRegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    return {
-        "token": "password_token_placeholder",
+    token = create_token({"sub": str(user.id), "role": "user"})
+
+    return _ok({
+        "token": token,
         "user": {
             "id": user.id,
             "nickname": user.nickname,
@@ -96,7 +104,7 @@ async def register(req: PasswordRegisterRequest, db: Session = Depends(get_db)):
             "team_name": None,
             "team_role": None
         }
-    }
+    })
 
 
 # ─── 微信登录（保留兼容） ───
@@ -190,7 +198,10 @@ async def get_user_profile(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{user_id}/bookings")
-async def get_user_bookings(user_id: int, db: Session = Depends(get_db)):
+async def get_user_bookings(user_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    # 只能查自己的预约
+    if user.id != user_id:
+        raise HTTPException(status_code=403, detail="无权查看他人预约")
     bookings = db.query(Booking).filter_by(user_id=user_id).order_by(
         Booking.created_at.desc()
     ).all()
@@ -210,8 +221,10 @@ async def get_user_bookings(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{user_id}/bookings/{booking_id}/cancel")
-async def user_cancel_booking(user_id: int, booking_id: int, db: Session = Depends(get_db)):
+async def user_cancel_booking(user_id: int, booking_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     """用户取消预约（需检查频次限制）"""
+    if user.id != user_id:
+        raise HTTPException(status_code=403, detail="无权操作")
     booking = db.query(Booking).filter_by(id=booking_id, user_id=user_id).first()
     if not booking:
         raise HTTPException(status_code=404, detail="预约不存在")

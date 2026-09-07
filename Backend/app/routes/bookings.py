@@ -5,7 +5,7 @@ from app.models import (
     Booking, BookingStatus, TimeSlot, Venue, Team, User, TeamMember, TeamRole,
     DrawRecord, CancelRecord, AdminUser, AdminRole
 )
-from app.routes.auth import get_current_admin, require_role
+from app.routes.auth import get_current_admin, require_role, get_current_user
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timezone, timedelta
@@ -27,7 +27,7 @@ class CreateBookingBody(BaseModel):
 
 
 @router.post("")
-async def create_booking(body: CreateBookingBody, db: Session = Depends(get_db)):
+async def create_booking(body: CreateBookingBody, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     """用户端：提交预约申请（每个时间段一条 booking，允许不同团队竞争同一时间段）"""
     if not body.time_slot_ids:
         raise HTTPException(status_code=400, detail="请选择至少一个时间段")
@@ -44,8 +44,10 @@ async def create_booking(body: CreateBookingBody, db: Session = Depends(get_db))
     if not team:
         raise HTTPException(status_code=404, detail="团队不存在")
 
-    # TODO: 验证用户身份（开发阶段暂时跳过）
-    # 正式上线时需从 JWT/Bearer token 解析 user_id
+    # 验证用户是否属于该团队
+    membership = db.query(TeamMember).filter_by(user_id=user.id, team_id=body.team_id).first()
+    if not membership:
+        raise HTTPException(status_code=400, detail="您不属于该团队")
 
     # 检查2周内成功预约次数
     two_weeks_ago = now_cn() - timedelta(days=14)
@@ -54,8 +56,8 @@ async def create_booking(body: CreateBookingBody, db: Session = Depends(get_db))
         Booking.status == BookingStatus.WON,
         Booking.created_at >= two_weeks_ago
     ).count()
-    if recent_wins >= 2:
-        raise HTTPException(status_code=400, detail="2周内成功预约已达上限（2次）")
+    if recent_wins >= 4:
+        raise HTTPException(status_code=400, detail="2周内成功预约已达上限（4次）")
 
     created = []
     for slot_id in body.time_slot_ids:
@@ -81,7 +83,7 @@ async def create_booking(body: CreateBookingBody, db: Session = Depends(get_db))
             raise HTTPException(status_code=400, detail=f"您的团队已预约时间段 {slot_id}")
 
         booking = Booking(
-            user_id=1,  # TODO: 替换为真实 user_id
+            user_id=user.id,
             team_id=body.team_id,
             venue_id=body.venue_id,
             time_slot_id=slot_id,

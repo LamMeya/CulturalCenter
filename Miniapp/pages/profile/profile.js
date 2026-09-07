@@ -1,97 +1,158 @@
-// pages/profile/profile.js — 我的个人中心
+// pages/profile/profile.js — 个人中心
 const api = require('../../utils/api');
-const app = getApp();
+// 安全获取 App 实例，未就绪时返回空壳 globalData，避免 getApp() 返回 undefined 导致崩溃
+let _appInstance = null;
+function getAppInstance() {
+  if (!_appInstance) {
+    try { _appInstance = getApp(); } catch (e) { _appInstance = null; }
+  }
+  return _appInstance || { globalData: {} };
+}
 
 Page({
   data: {
     isLoggedIn: false,
     userInfo: null,
     teamInfo: null,
-    loading: false
+    loading: false,
+    // 登录/注册切换
+    authMode: 'login', // 'login' | 'register'
+    username: '',
+    password: '',
+    confirmPassword: '',
+    nickname: '',
+    phone: '',
+    authLoading: false
   },
 
   onShow() {
     this.checkLoginStatus();
-    if (app.globalData.userId) {
+    if (getAppInstance().globalData.userId) {
       this.loadProfile();
     }
   },
 
-  /**
-   * 检查登录状态
-   */
   checkLoginStatus() {
-    const isLoggedIn = !!(app.globalData.token && app.globalData.userId);
+    const gd = getAppInstance().globalData || {};
+    const isLoggedIn = !!(gd.token && gd.userId);
     this.setData({
       isLoggedIn,
-      userInfo: isLoggedIn ? app.globalData.userInfo : null
+      userInfo: isLoggedIn ? gd.userInfo : null
     });
   },
 
-  /**
-   * 加载用户资料
-   */
-  async loadProfile() {
-    const userId = app.globalData.userId;
-    if (!userId) return;
+  onSwitchAuthMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    this.setData({
+      authMode: mode,
+      username: '',
+      password: '',
+      confirmPassword: '',
+      nickname: '',
+      phone: ''
+    });
+  },
 
-    this.setData({ loading: true });
+  onInputField(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({ [field]: e.detail.value });
+  },
 
+  async onPhoneLogin() {
+    const { username, password } = this.data;
+    if (!username.trim()) { wx.showToast({ title: '请输入账号', icon: 'none' }); return; }
+    if (!password || password.length < 4) { wx.showToast({ title: '密码至少4位', icon: 'none' }); return; }
+    this.setData({ authLoading: true });
     try {
-      const res = await api.get(`/api/users/${userId}/profile`);
-      const profile = res.profile || res.data || res;
+      const userInfo = await getAppInstance().phoneLogin(username.trim(), password);
+      this.setData({ isLoggedIn: true, userInfo, authLoading: false });
+      wx.showToast({ title: '登录成功', icon: 'success' });
+      this.loadProfile();
+    } catch (err) {
+      this.setData({ authLoading: false });
+      wx.showToast({ title: (err && err.message) || '登录失败', icon: 'none' });
+    }
+  },
+
+  async onPhoneRegister() {
+    const { username, password, confirmPassword, nickname, phone } = this.data;
+    if (!username.trim()) { wx.showToast({ title: '请输入账号', icon: 'none' }); return; }
+    if (!password || password.length < 4) { wx.showToast({ title: '密码至少4位', icon: 'none' }); return; }
+    if (password !== confirmPassword) { wx.showToast({ title: '两次密码不一致', icon: 'none' }); return; }
+    this.setData({ authLoading: true });
+    try {
+      const userInfo = await getAppInstance().phoneRegister(
+        username.trim(), password,
+        nickname.trim() || username.trim(),
+        phone.trim()
+      );
+      this.setData({ isLoggedIn: true, userInfo, authLoading: false });
+      wx.showToast({ title: '注册成功', icon: 'success' });
+      this.loadProfile();
+    } catch (err) {
+      this.setData({ authLoading: false });
+      wx.showToast({ title: (err && err.message) || '注册失败', icon: 'none' });
+    }
+  },
+
+  async onWxLogin() {
+    wx.showLoading({ title: '微信登录中...', mask: true });
+    try {
+      const userInfo = await getAppInstance().wxLogin();
+      this.setData({ isLoggedIn: true, userInfo });
+      wx.hideLoading();
+      wx.showToast({ title: '登录成功', icon: 'success' });
+      this.loadProfile();
+    } catch (err) {
+      wx.hideLoading();
+      wx.showToast({ title: '微信登录失败，请重试', icon: 'none' });
+      console.error('微信登录失败:', err);
+    }
+  },
+
+  // ========== 加载用户资料：api.get 已解包返回 profile ==========
+  async loadProfile() {
+    const userId = getAppInstance().globalData.userId;
+    if (!userId) return;
+    this.setData({ loading: true });
+    try {
+      const profile = await api.get(`/users/${userId}/profile`);
+      // profile 字段：{ id, nickname, phone, avatar_url, team_id, team_name, team_role }
+      const userInfo = {
+        nickname: profile.nickname || '用户',
+        phone: profile.phone || '',
+        avatar: profile.avatar_url || '',
+        team_id: profile.team_id || null,
+        team_name: profile.team_name || null,
+        team_role: profile.team_role || null,
+        id: profile.id,
+        user_id: profile.id
+      };
       this.setData({
-        userInfo: {
-          nickname: profile.nickname || '用户',
-          phone: profile.phone || '',
-          avatar: profile.avatar || ''
+        userInfo,
+        teamInfo: {
+          team_id: profile.team_id,
+          team_name: profile.team_name,
+          team_role: profile.team_role
         },
-        teamInfo: profile.team || null,
         loading: false
       });
-
-      // 更新全局数据
-      app.globalData.userInfo = profile;
-      wx.setStorageSync('userInfo', profile);
+      getAppInstance().globalData.userInfo = userInfo;
+      wx.setStorageSync('userInfo', userInfo);
     } catch (err) {
       console.error('加载用户资料失败:', err);
       this.setData({ loading: false });
     }
   },
 
-  /**
-   * 微信登录
-   */
-  async onLogin() {
-    wx.showLoading({ title: '登录中...', mask: true });
-    try {
-      const userInfo = await app.wxLogin();
-      this.setData({
-        isLoggedIn: true,
-        userInfo: userInfo
-      });
-      wx.hideLoading();
-      wx.showToast({ title: '登录成功', icon: 'success' });
-      this.loadProfile();
-    } catch (err) {
-      wx.hideLoading();
-      wx.showToast({ title: '登录失败，请重试', icon: 'none' });
-      console.error('登录失败:', err);
-    }
-  },
-
-  /**
-   * 绑定手机号
-   */
   onGetPhoneNumber(e) {
     if (e.detail.errMsg !== 'getPhoneNumber:ok') {
       wx.showToast({ title: '取消授权', icon: 'none' });
       return;
     }
-
     wx.showLoading({ title: '绑定中...', mask: true });
-    app.bindPhoneNumber(e.detail.encryptedData, e.detail.iv)
-      .then((res) => {
+    getAppInstance().bindPhoneNumber(e.detail.encryptedData, e.detail.iv)
+      .then(() => {
         wx.hideLoading();
         wx.showToast({ title: '手机号绑定成功', icon: 'success' });
         this.loadProfile();
@@ -103,9 +164,6 @@ Page({
       });
   },
 
-  /**
-   * 退出登录
-   */
   onLogout() {
     wx.showModal({
       title: '确认退出',
@@ -113,10 +171,11 @@ Page({
       confirmColor: '#d4644a',
       success: (res) => {
         if (res.confirm) {
-          app.globalData.token = null;
-          app.globalData.userInfo = null;
-          app.globalData.userId = null;
-          app.globalData.openid = null;
+          const gd = getAppInstance().globalData || {};
+          gd.token = null;
+          gd.userInfo = null;
+          gd.userId = null;
+          gd.openid = null;
           wx.removeStorageSync('token');
           wx.removeStorageSync('userInfo');
           this.setData({
@@ -130,16 +189,10 @@ Page({
     });
   },
 
-  /**
-   * 跳转团队页面
-   */
   onGoToTeam() {
     wx.switchTab({ url: '/pages/team/team' });
   },
 
-  /**
-   * 跳转预约记录
-   */
   onGoToBookings() {
     wx.switchTab({ url: '/pages/bookings/bookings' });
   }
