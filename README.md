@@ -329,6 +329,8 @@ docker run -d -p 8000:8000 --env-file .env zhuhai-art-backend
 
 ## 八、项目文档
 
+可视化架构图见 [`docs/architecture.md`](docs/architecture.md)，包含系统架构、预约调用链路、数据模型 ER 图、后端路由模块、 Flutter 层级结构（GitHub/Gitee 原生渲染 Mermaid）。
+
 详细文档见 `项目文档/` 目录：
 
 - `需求文档.md` — 产品需求
